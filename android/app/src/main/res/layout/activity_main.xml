@@ -35,20 +35,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tbScript" />
 
-        <TextView
-            android:layout_marginTop="30dp"
-            android:id="@+id/tts_api_key_label"
-            style="@style/title01"
-            android:text="@string/tts_input_api_key"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnSubmit" />
-
-        <EditText
-            android:id="@+id/tbApiKey"
-            style="@style/edit01"
+        <ImageButton
+            android:id="@+id/btnConfig"
+            style="@style/buttonConfig"
+            android:enabled="false"
+            android:onClick="onClickConfig"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tts_api_key_label" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
