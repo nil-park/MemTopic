@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MemTopic</string>
+    <string name="tts_input">Input your text</string>
+    <string name="tts_submit">Submit</string>
 </resources>
