@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">MemTopic</string>
+    <string name="timeout">request timeout</string>
     <string name="tts_input">Input your text</string>
+    <string name="tts_input_api_key">Input your GCP API key</string>
     <string name="tts_submit">Submit</string>
 </resources>

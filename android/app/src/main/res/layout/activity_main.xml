@@ -13,7 +13,7 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/tts_input_label"
             style="@style/title01"
             android:text="@string/tts_input"
             app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +24,7 @@
             style="@style/edit01"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
+            app:layout_constraintTop_toBottomOf="@id/tts_input_label" />
 
         <Button
             android:id="@+id/btnSubmit"
@@ -34,6 +34,21 @@
             android:text="@string/tts_submit"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tbScript" />
+
+        <TextView
+            android:layout_marginTop="30dp"
+            android:id="@+id/tts_api_key_label"
+            style="@style/title01"
+            android:text="@string/tts_input_api_key"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnSubmit" />
+
+        <EditText
+            android:id="@+id/tbApiKey"
+            style="@style/edit01"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tts_api_key_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
