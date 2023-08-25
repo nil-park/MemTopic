@@ -4,6 +4,9 @@
     <string name="tts_input">Input your text</string>
     <string name="tts_input_api_key">Input your GCP API key</string>
     <string name="tts_submit">Submit</string>
+    <string name="common_accept">ACCEPT</string>
+    <string name="common_error">ERROR</string>
     <string name="add_topic_title">New Topic</string>
     <string name="add_topic_name">The unique topic name.</string>
+    <string name="add_topic_content">Input your topic content here.\n\nPlease add line breaks to separate blocks.</string>
 </resources>

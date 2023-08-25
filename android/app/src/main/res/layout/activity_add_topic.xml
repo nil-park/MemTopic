@@ -37,6 +37,7 @@
             />
 
         <EditText
+            android:id="@+id/tbTopicContent"
             android:layout_height="0dp"
             android:layout_marginTop="15dp"
             style="@style/editMultilineBordered"
@@ -45,6 +46,7 @@
             app:layout_constraintTop_toBottomOf="@id/tbTopicName"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintVertical_bias="0"
+            android:hint="@string/add_topic_content"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
