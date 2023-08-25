@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".AddTopicActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp">
+
+        <ImageButton
+            android:id="@+id/btnSubmit"
+            style="@style/buttonSubmit"
+            android:enabled="false"
+            android:onClick="onClickSubmit"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbTitle"
+            style="@style/title01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/add_topic_title" />
+
+        <EditText
+            android:id="@+id/tbTopicName"
+            style="@style/edit01"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnSubmit"
+            android:hint="@string/add_topic_name"
+            />
+
+        <EditText
+            android:layout_height="0dp"
+            android:layout_marginTop="15dp"
+            style="@style/editMultilineBordered"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tbTopicName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

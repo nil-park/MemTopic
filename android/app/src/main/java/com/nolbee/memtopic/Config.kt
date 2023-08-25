@@ -18,7 +18,7 @@ class Config {
     var uid: Int = 0
 
     @ColumnInfo(name = "TextToSpeachApiHost")
-    var textToSpApiHost: String = "GCP"
+    var textToSpeechApiHost: String = "GCP"
 
     @ColumnInfo(name = "TextToSpeachApiKey")
     var textToSpeechApiKey: String = ""

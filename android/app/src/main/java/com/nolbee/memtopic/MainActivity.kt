@@ -78,6 +78,12 @@ class MainActivity : AppCompatActivity() {
         synthesize(script)
     }
 
+    fun onClickAddTopic(view: View) {
+        Log.d(TAG, "onClickAddTopic")
+        val intent = Intent(this, AddTopicActivity::class.java)
+        resultLauncher.launch(intent)
+    }
+
     fun onClickConfig(view: View) {
         Log.d(TAG, "onClickConfig")
         val intent = Intent(this, ConfigActivity::class.java)
