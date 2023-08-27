@@ -115,7 +115,7 @@ fun SettingsIcon() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun TopicListPreview() {
     MemTopicTheme {
         TopicListLayout()
     }
