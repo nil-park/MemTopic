@@ -28,7 +28,7 @@ def synthesize(s: str):
     data = {
         "audioConfig": {"audioEncoding": "LINEAR16", "effectsProfileId": ["headphone-class-device"], "pitch": 0, "speakingRate": 1},
         "input": {"text": s},
-        "voice": VOICES[0]
+        "voice": VOICES[1]
     }
     response = requests.post(url, data=json.dumps(data), headers=HEADERS)
     if response.status_code != 200:
