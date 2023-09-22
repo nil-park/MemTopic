@@ -58,7 +58,8 @@ class TopicViewModel(
                 val topic = Topic(
                     name = name,
                     lastModified = lastModified,
-                    lastPlayback = lastPlayback
+                    lastPlayback = lastPlayback,
+                    content = ""
                 )
                 viewModelScope.launch {
                     dao.upsertTopic(topic)

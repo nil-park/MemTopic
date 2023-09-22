@@ -9,5 +9,6 @@ data class Topic(
     @PrimaryKey
     val name: String,
     val lastModified: Date,
-    val lastPlayback: Date
+    val lastPlayback: Date,
+    val content: String
 )
