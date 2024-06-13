@@ -43,7 +43,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TopicListLayout()
+                    ModalNavigationDrawerMain(
+                        accountContent = {
+                            ConfigView()
+                        },
+                        topicListContent = {
+                            TopicListLayout()
+                        },
+                    )
                 }
             }
         }

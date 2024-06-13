@@ -14,47 +14,25 @@
  * limitations under the License.
  */
 
-package androidx.compose.material3.samples
+package com.nolbee.memtopic
 
-import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Bookmarks
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Dashboard
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Headphones
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.JoinFull
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Laptop
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.Navigation
-import androidx.compose.material.icons.filled.Outbox
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.QrCode
-import androidx.compose.material.icons.filled.Radio
-import androidx.compose.material3.Button
-import androidx.compose.material3.DismissibleDrawerSheet
-import androidx.compose.material3.DismissibleNavigationDrawer
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.ManageAccounts
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.PermanentDrawerSheet
-import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -67,184 +45,84 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-@Preview
-@Sampled
 @Composable
-fun ModalNavigationDrawerSample() {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+private fun NavigationContentSample() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("This is a sample content")
+    }
+}
+
+@Composable
+fun ModalNavigationDrawerMain(
+    isClosed: Boolean = true,
+    accountContent: @Composable () -> Unit = { NavigationContentSample() },
+    topicListContent: @Composable () -> Unit = { NavigationContentSample() },
+    settingsContent: @Composable () -> Unit = { NavigationContentSample() },
+) {
+    val drawerState = rememberDrawerState(if (isClosed) DrawerValue.Closed else DrawerValue.Open)
     val scope = rememberCoroutineScope()
-    // icons to mimic drawer destinations
-    val items =
-        listOf(
-            Icons.Default.AccountCircle,
-            Icons.Default.Bookmarks,
-            Icons.Default.CalendarMonth,
-            Icons.Default.Dashboard,
-            Icons.Default.Email,
-            Icons.Default.Favorite,
-            Icons.Default.Group,
-            Icons.Default.Headphones,
-            Icons.Default.Image,
-            Icons.Default.JoinFull,
-            Icons.Default.Keyboard,
-            Icons.Default.Laptop,
-            Icons.Default.Map,
-            Icons.Default.Navigation,
-            Icons.Default.Outbox,
-            Icons.Default.PushPin,
-            Icons.Default.QrCode,
-            Icons.Default.Radio,
-        )
-    val selectedItem = remember { mutableStateOf(items[0]) }
+    val selectedItem = remember { mutableStateOf(topicListContent) }
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(drawerState) {
+            ModalDrawerSheet {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
-                    Spacer(Modifier.height(12.dp))
-                    items.forEach { item ->
-                        NavigationDrawerItem(
-                            icon = { Icon(item, contentDescription = null) },
-                            label = { Text(item.name.substringAfterLast(".")) },
-                            selected = item == selectedItem.value,
-                            onClick = {
-                                scope.launch { drawerState.close() }
-                                selectedItem.value = item
-                            },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                        )
-                    }
+                    Spacer(Modifier.height(20.dp))
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.ManageAccounts, contentDescription = null) },
+                        label = { Text("계정 관리") }, // TODO: replace this string with a string resource to achieve multi-language support.
+                        selected = accountContent == selectedItem.value,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            selectedItem.value = accountContent
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                    NavigationDrawerItem(
+                        icon = {
+                            Icon(
+                                Icons.AutoMirrored.Filled.FormatListBulleted,
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text("토픽 리스트") }, // TODO: replace this string with a string resource to achieve multi-language support.
+                        selected = topicListContent == selectedItem.value,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            selectedItem.value = topicListContent
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                        label = { Text("플레이 설정") }, // TODO: replace this string with a string resource to achieve multi-language support.
+                        selected = settingsContent == selectedItem.value,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            selectedItem.value = settingsContent
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
                 }
             }
         },
         content = {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
-                Spacer(Modifier.height(20.dp))
-                Button(onClick = { scope.launch { drawerState.open() } }) { Text("Click to open") }
-            }
+            val innerContent: @Composable () -> Unit = selectedItem.value
+            innerContent()
         }
     )
 }
 
-@Preview
-@Sampled
-@Composable
-fun PermanentNavigationDrawerSample() {
-    // icons to mimic drawer destinations
-    val items =
-        listOf(
-            Icons.Default.AccountCircle,
-            Icons.Default.Bookmarks,
-            Icons.Default.CalendarMonth,
-            Icons.Default.Dashboard,
-            Icons.Default.Email,
-            Icons.Default.Favorite,
-            Icons.Default.Group,
-            Icons.Default.Headphones,
-            Icons.Default.Image,
-            Icons.Default.JoinFull,
-            Icons.Default.Keyboard,
-            Icons.Default.Laptop,
-            Icons.Default.Map,
-            Icons.Default.Navigation,
-            Icons.Default.Outbox,
-            Icons.Default.PushPin,
-            Icons.Default.QrCode,
-            Icons.Default.Radio,
-        )
-    val selectedItem = remember { mutableStateOf(items[0]) }
-    PermanentNavigationDrawer(
-        drawerContent = {
-            PermanentDrawerSheet(Modifier.width(240.dp)) {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
-                    Spacer(Modifier.height(12.dp))
-                    items.forEach { item ->
-                        NavigationDrawerItem(
-                            icon = { Icon(item, contentDescription = null) },
-                            label = { Text(item.name.substringAfterLast(".")) },
-                            selected = item == selectedItem.value,
-                            onClick = { selectedItem.value = item },
-                            modifier = Modifier.padding(horizontal = 12.dp)
-                        )
-                    }
-                }
-            }
-        },
-        content = {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "Application content")
-            }
-        }
-    )
-}
 
 @Preview
-@Sampled
 @Composable
-fun DismissibleNavigationDrawerSample() {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    // icons to mimic drawer destinations
-    val items =
-        listOf(
-            Icons.Default.AccountCircle,
-            Icons.Default.Bookmarks,
-            Icons.Default.CalendarMonth,
-            Icons.Default.Dashboard,
-            Icons.Default.Email,
-            Icons.Default.Favorite,
-            Icons.Default.Group,
-            Icons.Default.Headphones,
-            Icons.Default.Image,
-            Icons.Default.JoinFull,
-            Icons.Default.Keyboard,
-            Icons.Default.Laptop,
-            Icons.Default.Map,
-            Icons.Default.Navigation,
-            Icons.Default.Outbox,
-            Icons.Default.PushPin,
-            Icons.Default.QrCode,
-            Icons.Default.Radio,
-        )
-    val selectedItem = remember { mutableStateOf(items[0]) }
-
-    DismissibleNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DismissibleDrawerSheet(drawerState) {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
-                    Spacer(Modifier.height(12.dp))
-                    items.forEach { item ->
-                        NavigationDrawerItem(
-                            icon = { Icon(item, contentDescription = null) },
-                            label = { Text(item.name.substringAfterLast(".")) },
-                            selected = item == selectedItem.value,
-                            onClick = {
-                                scope.launch { drawerState.close() }
-                                selectedItem.value = item
-                            },
-                            modifier = Modifier.padding(horizontal = 12.dp)
-                        )
-                    }
-                }
-            }
-        },
-        content = {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
-                Spacer(Modifier.height(20.dp))
-                Button(onClick = { scope.launch { drawerState.open() } }) { Text("Click to open") }
-            }
-        }
+fun ModalNavigationDrawerMainPreview() {
+    ModalNavigationDrawerMain(
+        isClosed = false
     )
 }
