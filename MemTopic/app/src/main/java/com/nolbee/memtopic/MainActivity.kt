@@ -30,7 +30,7 @@ fun MainView() {
     ModalNavigationDrawerMain(
         drawerState = drawerState,
         accountContent = {
-            ConfigView()
+            ConfigViewTopAppBar(onClickNavigationIcon)
         },
         topicListContent = {
             TopicListTopAppBar(onClickNavigationIcon)
