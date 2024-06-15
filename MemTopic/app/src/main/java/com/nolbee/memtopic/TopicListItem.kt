@@ -1,24 +1,33 @@
 package com.nolbee.memtopic
 
+import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.nolbee.memtopic.client.TextToSpeechGCP
 import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
 fun TopicListItem(topic: Topic) {
+    val coroutineScope = rememberCoroutineScope()
     Column {
         ListItem(
             headlineContent = { Text(topic.name) },
@@ -33,7 +42,22 @@ fun TopicListItem(topic: Topic) {
                 Icon(Icons.Filled.Edit, contentDescription = null)
             },
             leadingContent = {
-                Icon(Icons.Filled.Download, contentDescription = null)
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        try {
+                            // TODO: API 키를 keystore에서 가져오기. 그리고 play는 여기서 할 것이 아님...
+                            val client = TextToSpeechGCP("", "en-US", "en-US-Neural2-J")
+                            val audioBase64 = client.Synthesize(topic.content)
+                            withContext(Dispatchers.Main) {
+                                play(audioBase64)
+                            }
+                        } catch (e: Exception) {
+                            Log.d("GCPTest", "Error from synthesize(): $e")
+                        }
+                    }
+                }) {
+                    Icon(Icons.Filled.Download, contentDescription = null)
+                }
             }
         )
         HorizontalDivider()
@@ -69,3 +93,14 @@ val sampleTopic = Topic(
     """.trimIndent()
 )
 
+private fun play(audioBase64: String) {
+    val player = MediaPlayer()
+    try {
+        player.reset()
+        player.setDataSource("data:audio/mp3;base64,$audioBase64")
+        player.prepare()
+        player.start()
+    } catch (e: Exception) {
+        Log.d("GCPTest", "Error from play(): ${e.message}")
+    }
+}

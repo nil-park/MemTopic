@@ -21,8 +21,10 @@ import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConfigViewTopAppBar(onClickNavigationIcon: () -> Unit) {
-    val viewModel = ConfigViewModel()
+fun ConfigViewTopAppBar(
+    onClickNavigationIcon: () -> Unit,
+    viewModel: ConfigViewModel,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,7 +68,11 @@ fun ConfigViewTopAppBar(onClickNavigationIcon: () -> Unit) {
 @Composable
 fun ConfigViewTopAppBarPreview() {
     val onClickNavigationIcon: () -> Unit = {}
+    val viewModel = ConfigViewModel()
     MemTopicTheme {
-        ConfigViewTopAppBar(onClickNavigationIcon)
+        ConfigViewTopAppBar(
+            onClickNavigationIcon,
+            viewModel
+        )
     }
 }

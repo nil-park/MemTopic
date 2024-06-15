@@ -14,23 +14,24 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val configViewModel = ConfigViewModel()
         setContent {
             MemTopicTheme {
-                MainView()
+                MainView(configViewModel)
             }
         }
     }
 }
 
 @Composable
-fun MainView() {
+fun MainView(configViewModel: ConfigViewModel) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val onClickNavigationIcon: () -> Unit = { scope.launch { drawerState.open() } }
     ModalNavigationDrawerMain(
         drawerState = drawerState,
         accountContent = {
-            ConfigViewTopAppBar(onClickNavigationIcon)
+            ConfigViewTopAppBar(onClickNavigationIcon, configViewModel)
         },
         topicListContent = {
             TopicListTopAppBar(onClickNavigationIcon)
@@ -43,7 +44,8 @@ private const val TAG = "MainActivity"
 @Preview(showBackground = true)
 @Composable
 fun MainViewPreview() {
+    val configViewModel = ConfigViewModel()
     MemTopicTheme {
-        MainView()
+        MainView(configViewModel)
     }
 }
