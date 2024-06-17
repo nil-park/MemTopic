@@ -75,6 +75,6 @@ private fun TTSTokenTextField(viewModel: ConfigViewModel) {
 @Preview
 @Composable
 private fun GoogleCloudConfigViewPreview() {
-    val viewModel = ConfigViewModel()
+    val viewModel = DummyConfigViewModel()
     GoogleCloudConfigView(viewModel)
 }

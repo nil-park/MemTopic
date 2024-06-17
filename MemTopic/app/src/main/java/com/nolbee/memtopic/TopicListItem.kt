@@ -13,6 +13,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.nolbee.memtopic.client.TextToSpeechGCP
@@ -27,6 +28,7 @@ import java.util.Locale
 
 @Composable
 fun TopicListItem(topic: Topic) {
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     Column {
         ListItem(
@@ -46,7 +48,12 @@ fun TopicListItem(topic: Topic) {
                     coroutineScope.launch {
                         try {
                             // TODO: API 키를 keystore에서 가져오기. 그리고 play는 여기서 할 것이 아님...
-                            val client = TextToSpeechGCP("", "en-US", "en-US-Neural2-J")
+                            val keyValueStore = SecureKeyValueStore(context)
+                            val client = TextToSpeechGCP(
+                                keyValueStore.get("gcpTextToSpeechToken") ?: "",
+                                "en-US",
+                                "en-US-Neural2-J"
+                            )
                             val audioBase64 = client.Synthesize(topic.content)
                             withContext(Dispatchers.Main) {
                                 play(audioBase64)

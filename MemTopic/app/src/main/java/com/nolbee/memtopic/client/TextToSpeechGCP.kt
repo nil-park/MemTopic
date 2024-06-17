@@ -109,7 +109,7 @@ class TextToSpeechGCP(
         return audioBase64
     }
 
-    public suspend fun Synthesize(text: String): String {
+    suspend fun Synthesize(text: String): String {
         payload.input.text = text
         return synthesize()
     }

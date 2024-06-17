@@ -44,11 +44,17 @@ fun ConfigViewTopAppBar(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.CheckCircle,
-                            contentDescription = null
-                        )
+                    if (viewModel.gcpIsTextToSpeechTokenModified) {
+                        IconButton(
+                            onClick = {
+                                viewModel.saveGcpTextToSpeechToken()
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.CheckCircle,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
             )
@@ -68,7 +74,7 @@ fun ConfigViewTopAppBar(
 @Composable
 fun ConfigViewTopAppBarPreview() {
     val onClickNavigationIcon: () -> Unit = {}
-    val viewModel = ConfigViewModel()
+    val viewModel = DummyConfigViewModel()
     MemTopicTheme {
         ConfigViewTopAppBar(
             onClickNavigationIcon,
