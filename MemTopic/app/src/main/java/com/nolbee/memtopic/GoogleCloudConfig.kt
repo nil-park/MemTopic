@@ -1,5 +1,6 @@
 package com.nolbee.memtopic
 
+import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,6 +76,6 @@ private fun TTSTokenTextField(viewModel: ConfigViewModel) {
 @Preview
 @Composable
 private fun GoogleCloudConfigViewPreview() {
-    val viewModel = DummyConfigViewModel()
+    val viewModel = ConfigViewModel(Application())
     GoogleCloudConfigView(viewModel)
 }

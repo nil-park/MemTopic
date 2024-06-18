@@ -6,9 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 
-open class ConfigViewModel(application: Application) : AndroidViewModel(application) {
-    private val secureStore = SecureKeyValueStore(application)
-    var gcpTextToSpeechToken by mutableStateOf(loadGcpTextToSpeechToken())
+class ConfigViewModel(private val application: Application) : AndroidViewModel(application) {
+    private var secureStore: SecureKeyValueStore? = null
+
+    fun initSecureStore() {
+        secureStore = SecureKeyValueStore(application)
+        gcpTextToSpeechToken = loadGcpTextToSpeechToken()
+    }
+
+    var gcpTextToSpeechToken by mutableStateOf("")
         private set
 
     var gcpIsTextToSpeechTokenModified by mutableStateOf(false)
@@ -20,18 +26,11 @@ open class ConfigViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     open fun saveGcpTextToSpeechToken() {
-        secureStore.set("gcpTextToSpeechToken", gcpTextToSpeechToken)
+        secureStore?.set("gcpTextToSpeechToken", gcpTextToSpeechToken)
         gcpIsTextToSpeechTokenModified = false
     }
 
-    protected open fun loadGcpTextToSpeechToken(): String {
-        return secureStore.get("gcpTextToSpeechToken") ?: ""
+    private fun loadGcpTextToSpeechToken(): String {
+        return secureStore?.get("gcpTextToSpeechToken") ?: ""
     }
 }
-
-open class DummyConfigViewModel : ConfigViewModel(Application()) {
-    override fun saveGcpTextToSpeechToken() {}
-
-    override fun loadGcpTextToSpeechToken() = ""
-}
-

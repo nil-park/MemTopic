@@ -72,8 +72,9 @@ private const val HOST = "https://texttospeech.googleapis.com"
 
 class TextToSpeechGCP(
     private val apiKey: String,
-    private val languageCode: String,
-    private val voiceType: String) {
+    languageCode: String,
+    voiceType: String
+) {
 
     private var payload = TextToSpeechGCPRequest(
         TextToSpeechGCPRequestAudioConfig(),
@@ -86,7 +87,7 @@ class TextToSpeechGCP(
         val url = "$HOST/v1beta1/text:synthesize"
         withContext(Dispatchers.IO) {
             try {
-                HttpClient(CIO){
+                HttpClient(CIO) {
                     install(HttpTimeout) {
                         requestTimeoutMillis = 5000 // TODO: request timeout from configuration
                     }

@@ -17,7 +17,9 @@ import kotlinx.coroutines.launch
 class ConfigViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ConfigViewModel::class.java)) {
-            return ConfigViewModel(application) as T
+            val viewModel = ConfigViewModel(application)
+            viewModel.initSecureStore()
+            return viewModel as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
@@ -56,7 +58,7 @@ private const val TAG = "MainActivity"
 @Preview(showBackground = true)
 @Composable
 fun MainViewPreview() {
-    val configViewModel = DummyConfigViewModel()
+    val configViewModel = ConfigViewModel(Application())
     MemTopicTheme {
         MainView(configViewModel)
     }

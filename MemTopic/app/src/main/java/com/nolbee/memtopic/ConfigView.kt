@@ -1,5 +1,6 @@
 package com.nolbee.memtopic
 
+import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -74,7 +75,7 @@ fun ConfigViewTopAppBar(
 @Composable
 fun ConfigViewTopAppBarPreview() {
     val onClickNavigationIcon: () -> Unit = {}
-    val viewModel = DummyConfigViewModel()
+    val viewModel = ConfigViewModel(Application())
     MemTopicTheme {
         ConfigViewTopAppBar(
             onClickNavigationIcon,
