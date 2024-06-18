@@ -21,13 +21,18 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import kotlinx.coroutines.launch
 
@@ -46,12 +51,10 @@ private fun NavigationContentSample() {
 @Composable
 fun ModalNavigationDrawerMain(
     drawerState: DrawerState,
-    accountContent: @Composable () -> Unit = { NavigationContentSample() },
-    topicListContent: @Composable () -> Unit = { NavigationContentSample() },
-    settingsContent: @Composable () -> Unit = { NavigationContentSample() },
+    navController: NavHostController,
+    navHost: @Composable () -> Unit = { NavigationContentSample() },
 ) {
     val scope = rememberCoroutineScope()
-    val selectedItem = remember { mutableStateOf(topicListContent) }
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -61,10 +64,13 @@ fun ModalNavigationDrawerMain(
                     NavigationDrawerItem(
                         icon = { Icon(Icons.Default.ManageAccounts, contentDescription = null) },
                         label = { Text("계정 관리") }, // TODO: replace this string with a string resource to achieve multi-language support.
-                        selected = accountContent == selectedItem.value,
+                        selected = navController.getCurrentRoute() == "ConfigView",
                         onClick = {
                             scope.launch { drawerState.close() }
-                            selectedItem.value = accountContent
+                            navController.navigate("ConfigView") {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
@@ -76,20 +82,26 @@ fun ModalNavigationDrawerMain(
                             )
                         },
                         label = { Text("토픽 리스트") }, // TODO: replace this string with a string resource to achieve multi-language support.
-                        selected = topicListContent == selectedItem.value,
+                        selected = navController.getCurrentRoute() == "TopicList",
                         onClick = {
                             scope.launch { drawerState.close() }
-                            selectedItem.value = topicListContent
+                            navController.navigate("TopicList") {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                     NavigationDrawerItem(
                         icon = { Icon(Icons.Default.Settings, contentDescription = null) },
                         label = { Text("플레이 설정") }, // TODO: replace this string with a string resource to achieve multi-language support.
-                        selected = settingsContent == selectedItem.value,
+                        selected = navController.getCurrentRoute() == "SettingsView",
                         onClick = {
                             scope.launch { drawerState.close() }
-                            selectedItem.value = settingsContent
+                            navController.navigate("TopicList") {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
@@ -97,20 +109,32 @@ fun ModalNavigationDrawerMain(
             }
         },
         content = {
-            val innerContent: @Composable () -> Unit = selectedItem.value
-            innerContent()
+            navHost()
         }
     )
 }
-
+@Composable
+fun NavController.getCurrentRoute(): String? {
+    val navBackStackEntry by currentBackStackEntryAsState()
+    return navBackStackEntry?.destination?.route
+}
 
 @Preview
 @Composable
 fun ModalNavigationDrawerMainPreview() {
     val drawerState = rememberDrawerState(DrawerValue.Open)
+    val navController = rememberNavController()
     MemTopicTheme {
         ModalNavigationDrawerMain(
-            drawerState = drawerState
+            drawerState = drawerState,
+            navController = navController,
+            navHost = {
+                NavHost(navController = navController, startDestination = "TopicList") {
+                    composable("ConfigView") { NavigationContentSample() }
+                    composable("TopicList") { NavigationContentSample() }
+                    composable("EditTopicView") { NavigationContentSample()}
+                }
+            }
         )
     }
 }

@@ -11,6 +11,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import kotlinx.coroutines.launch
 
@@ -28,7 +31,10 @@ class ConfigViewModelFactory(private val application: Application) : ViewModelPr
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val configViewModel = ViewModelProvider(this, ConfigViewModelFactory(application))[ConfigViewModel::class.java]
+        val configViewModel = ViewModelProvider(
+            this,
+            ConfigViewModelFactory(application)
+        )[ConfigViewModel::class.java]
         setContent {
             MemTopicTheme {
                 MainView(configViewModel)
@@ -38,18 +44,40 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainView(configViewModel: ConfigViewModel) {
+fun MainView(
+    configViewModel: ConfigViewModel = ConfigViewModel(Application()),
+    editTopicViewModel: EditTopicViewModel = EditTopicViewModel(Application())
+) {
+    val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val onClickNavigationIcon: () -> Unit = { scope.launch { drawerState.open() } }
     ModalNavigationDrawerMain(
         drawerState = drawerState,
-        accountContent = {
-            ConfigViewTopAppBar(onClickNavigationIcon, configViewModel)
-        },
-        topicListContent = {
-            TopicListTopAppBar(onClickNavigationIcon)
-        },
+        navController = navController,
+        navHost = {
+            NavHost(navController = navController, startDestination = "TopicList") {
+                composable("ConfigView") {
+                    ConfigViewTopAppBar(
+                        onClickNavigationIcon = onClickNavigationIcon,
+                        viewModel = configViewModel
+                    )
+                }
+                composable("TopicList") {
+                    TopicListTopAppBar(
+                        onClickNavigationIcon = onClickNavigationIcon,
+                        navController = navController,
+                        editTopicViewModel = editTopicViewModel
+                    )
+                }
+                composable("EditTopicView") {
+                    EditTopicViewTopAppBar(
+                        onClickNavigationIcon = onClickNavigationIcon,
+                        viewModel = editTopicViewModel
+                    )
+                }
+            }
+        }
     )
 }
 
@@ -58,8 +86,7 @@ private const val TAG = "MainActivity"
 @Preview(showBackground = true)
 @Composable
 fun MainViewPreview() {
-    val configViewModel = ConfigViewModel(Application())
     MemTopicTheme {
-        MainView(configViewModel)
+        MainView()
     }
 }

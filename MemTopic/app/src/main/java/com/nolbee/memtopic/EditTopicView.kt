@@ -31,8 +31,8 @@ private const val TAG = "AddTopicView"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTopicViewTopAppBar(
-    onClickNavigationIcon: () -> Unit,
-    viewModel: EditTopicViewModel,
+    onClickNavigationIcon: () -> Unit = {},
+    viewModel: EditTopicViewModel = EditTopicViewModel(Application()),
 ) {
     Scaffold(
         topBar = {
@@ -103,8 +103,8 @@ private fun TopicTitleTextField(viewModel: EditTopicViewModel) {
 private fun TopicContentTextField(viewModel: EditTopicViewModel) {
     val scrollState = rememberScrollState()
     TextField(
-        value = viewModel.topicTitle,
-        onValueChange = { viewModel.updateTitle(it) },
+        value = viewModel.topicContent,
+        onValueChange = { viewModel.updateContent(it) },
         modifier = Modifier.fillMaxSize(1f).verticalScroll(scrollState),
         singleLine = false,
         label = { Text("내용") },  // TODO: replace this string with a string resource to achieve multi-language support.
@@ -115,12 +115,7 @@ private fun TopicContentTextField(viewModel: EditTopicViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun EditTopicPreview() {
-    val onClickNavigationIcon: () -> Unit = {}
-    val viewModel = EditTopicViewModel(Application())
     MemTopicTheme {
-        EditTopicViewTopAppBar(
-            onClickNavigationIcon,
-            viewModel
-        )
+        EditTopicViewTopAppBar()
     }
 }

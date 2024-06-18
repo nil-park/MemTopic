@@ -1,5 +1,6 @@
 package com.nolbee.memtopic
 
+import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -15,11 +16,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopicListTopAppBar(onClickNavigationIcon: () -> Unit) {
+fun TopicListTopAppBar(
+    onClickNavigationIcon: () -> Unit = {},
+    navController: NavHostController = rememberNavController(),
+    editTopicViewModel: EditTopicViewModel = EditTopicViewModel(Application())
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -39,7 +46,10 @@ fun TopicListTopAppBar(onClickNavigationIcon: () -> Unit) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* doSomething() */ }) {
+                    IconButton(onClick = {
+                        editTopicViewModel.prepareAddNewTopic()
+                        navController.navigate("EditTopicView")
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.AddCircle,
                             contentDescription = null
@@ -67,8 +77,7 @@ fun TopicListTopAppBar(onClickNavigationIcon: () -> Unit) {
 @Preview
 @Composable
 fun TopicListTopAppBarPreview() {
-    val onClickNavigationIcon: () -> Unit = {}
     MemTopicTheme {
-        TopicListTopAppBar(onClickNavigationIcon)
+        TopicListTopAppBar()
     }
 }
