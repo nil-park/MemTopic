@@ -4,6 +4,8 @@ import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -14,6 +16,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
+import com.nolbee.memtopic.database.TopicDatabase
+import com.nolbee.memtopic.database.TopicRepository
+import com.nolbee.memtopic.database.TopicViewModel
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import kotlinx.coroutines.launch
 
@@ -22,7 +28,19 @@ class ConfigViewModelFactory(private val application: Application) : ViewModelPr
         if (modelClass.isAssignableFrom(ConfigViewModel::class.java)) {
             val viewModel = ConfigViewModel(application)
             viewModel.initSecureStore()
-            return viewModel as T
+            return modelClass.cast(viewModel)
+                ?: throw IllegalArgumentException("Cannot cast to ConfigViewModel")
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+class TopicViewModelFactory(private val repository: TopicRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TopicViewModel::class.java)) {
+            val viewModel = TopicViewModel(repository)
+            return modelClass.cast(viewModel)
+                ?: throw IllegalArgumentException("Cannot cast to ConfigViewModel")
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
@@ -35,9 +53,20 @@ class MainActivity : ComponentActivity() {
             this,
             ConfigViewModelFactory(application)
         )[ConfigViewModel::class.java]
+        val topicDb = Room.databaseBuilder(
+            applicationContext,
+            TopicDatabase::class.java,
+            "topicDatabase"
+        ).build()
+        val topicDao = topicDb.topicDao()
+        val topicRepository = TopicRepository(topicDao)
+        val topicViewModel = ViewModelProvider(
+            this,
+            TopicViewModelFactory(topicRepository)
+        )[TopicViewModel::class.java]
         setContent {
             MemTopicTheme {
-                MainView(configViewModel)
+                MainView(configViewModel, topicViewModel)
             }
         }
     }
@@ -46,7 +75,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainView(
     configViewModel: ConfigViewModel = ConfigViewModel(Application()),
-    editTopicViewModel: EditTopicViewModel = EditTopicViewModel(Application())
+    topicViewModel: TopicViewModel = TopicViewModel(TopicRepository(MockTopicDao()))
 ) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
@@ -57,23 +86,34 @@ fun MainView(
         navController = navController,
         navHost = {
             NavHost(navController = navController, startDestination = "TopicList") {
-                composable("ConfigView") {
+                composable(
+                    "ConfigView",
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None }
+                ) {
                     ConfigViewTopAppBar(
                         onClickNavigationIcon = onClickNavigationIcon,
                         viewModel = configViewModel
                     )
                 }
-                composable("TopicList") {
+                composable(
+                    "TopicList",
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None }
+                ) {
                     TopicListTopAppBar(
                         onClickNavigationIcon = onClickNavigationIcon,
                         navController = navController,
-                        editTopicViewModel = editTopicViewModel
+                        topicViewModel = topicViewModel,
                     )
                 }
-                composable("EditTopicView") {
+                composable(
+                    "EditTopicView",
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None }
+                ) {
                     EditTopicViewTopAppBar(
                         onClickNavigationIcon = onClickNavigationIcon,
-                        viewModel = editTopicViewModel
                     )
                 }
             }

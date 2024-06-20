@@ -22,7 +22,6 @@ class TopicRepository(private val topicDao: TopicDao) {
             TopicSortType.TITLE -> topicDao.selectTopicByName()
             TopicSortType.LAST_MODIFIED -> topicDao.selectTopicByLastModified()
             TopicSortType.LAST_PLAYBACK -> topicDao.selectTopicByLastPlayback()
-            else -> topicDao.selectTopicByLastPlayback()
         }
     }
 }

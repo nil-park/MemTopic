@@ -56,5 +56,5 @@ class Converters {
 @Database(entities = [Topic::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class TopicDatabase : RoomDatabase() {
-    abstract val dao: TopicDao
+    abstract fun topicDao(): TopicDao
 }

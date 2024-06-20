@@ -1,6 +1,5 @@
 package com.nolbee.memtopic
 
-import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +31,7 @@ private const val TAG = "AddTopicView"
 @Composable
 fun EditTopicViewTopAppBar(
     onClickNavigationIcon: () -> Unit = {},
-    viewModel: EditTopicViewModel = EditTopicViewModel(Application()),
+    viewModel: EditTopicViewModel = EditTopicViewModel(),
 ) {
     Scaffold(
         topBar = {

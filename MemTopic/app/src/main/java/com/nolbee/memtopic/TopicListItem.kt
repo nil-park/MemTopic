@@ -32,7 +32,7 @@ fun TopicListItem(topic: Topic) {
     val coroutineScope = rememberCoroutineScope()
     Column {
         ListItem(
-            headlineContent = { Text(topic.name) },
+            headlineContent = { Text(topic.title) },
             supportingContent = {
                 Text(
                     topic.content,
@@ -75,17 +75,28 @@ fun TopicListItem(topic: Topic) {
 @Composable
 fun TopicListItemPreview() {
     MemTopicTheme {
-        TopicListItem(sampleTopic)
+        TopicListItem(sampleTopic00)
+    }
+}
+
+private fun play(audioBase64: String) {
+    val player = MediaPlayer()
+    try {
+        player.reset()
+        player.setDataSource("data:audio/mp3;base64,$audioBase64")
+        player.prepare()
+        player.start()
+    } catch (e: Exception) {
+        Log.d("GCPTest", "Error from play(): ${e.message}")
     }
 }
 
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
-private val lastModified: Date = dateFormat.parse("2023-09-12") ?: Date()
-private val lastPlayback: Date = dateFormat.parse("2023-09-28") ?: Date()
-val sampleTopic = Topic(
-    name = "Insertion Sort",
-    lastModified = lastModified,
-    lastPlayback = lastPlayback,
+val sampleTopic00 = Topic(
+    id = 1,
+    title = "Insertion Sort",
+    lastModified = dateFormat.parse("2023-09-12") ?: Date(),
+    lastPlayback = dateFormat.parse("2023-09-28") ?: Date(),
     content = """
         We start with insertion sort, which is an efficient algorithm for sorting a small number of elements.
         Insertion sort works the way many people sort a hand of playing cards.
@@ -99,15 +110,16 @@ val sampleTopic = Topic(
         and these cards were originally the top cards of the pile on the table.
     """.trimIndent()
 )
-
-private fun play(audioBase64: String) {
-    val player = MediaPlayer()
-    try {
-        player.reset()
-        player.setDataSource("data:audio/mp3;base64,$audioBase64")
-        player.prepare()
-        player.start()
-    } catch (e: Exception) {
-        Log.d("GCPTest", "Error from play(): ${e.message}")
-    }
-}
+val sampleTopic01 = Topic(
+    id = 2,
+    title = "Alias Method",
+    lastModified = dateFormat.parse("2023-06-21") ?: Date(),
+    lastPlayback = dateFormat.parse("2024-06-20") ?: Date(),
+    content = """
+        At a high level, the alias method works as follows.
+        First, we create rectangles to represent the different probabilities of the dice sides.
+        Next, we divide and rearrange those rectangles to fill a rectangular target completely.
+        Each column in the target has a fixed width and contains rectangles from at most two different sides of the loaded die.
+        Finally, we simulate die rolls by randomly throwing darts at the target, which we can achieve by using a combination of a fair die and a biased coin flip.
+    """.trimIndent()
+)

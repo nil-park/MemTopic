@@ -1,12 +1,11 @@
 package com.nolbee.memtopic
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 
-open class EditTopicViewModel(application: Application) : AndroidViewModel(application) {
+open class EditTopicViewModel() : ViewModel() {
     var topicTitle by mutableStateOf("")
         private set
 
