@@ -114,6 +114,8 @@ fun MainView(
                 ) {
                     EditTopicViewTopAppBar(
                         onClickNavigationIcon = onClickNavigationIcon,
+                        navController = navController,
+                        topicViewModel = topicViewModel,
                     )
                 }
             }

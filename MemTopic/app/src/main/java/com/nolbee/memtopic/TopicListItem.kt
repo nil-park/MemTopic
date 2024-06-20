@@ -4,8 +4,8 @@ import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,7 +63,8 @@ fun TopicListItem(topic: Topic) {
                         }
                     }
                 }) {
-                    Icon(Icons.Filled.Download, contentDescription = null)
+                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                    // Icon(Icons.Filled.Download, contentDescription = null)
                 }
             }
         )

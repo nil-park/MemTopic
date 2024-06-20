@@ -1,5 +1,6 @@
 package com.nolbee.memtopic
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +24,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.nolbee.memtopic.database.Topic
+import com.nolbee.memtopic.database.TopicRepository
+import com.nolbee.memtopic.database.TopicViewModel
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
+import java.util.Date
 
 private const val TAG = "AddTopicView"
 
@@ -31,7 +38,9 @@ private const val TAG = "AddTopicView"
 @Composable
 fun EditTopicViewTopAppBar(
     onClickNavigationIcon: () -> Unit = {},
-    viewModel: EditTopicViewModel = EditTopicViewModel(),
+    navController: NavHostController = rememberNavController(),
+    topicViewModel: TopicViewModel = TopicViewModel(TopicRepository(MockTopicDao())),
+    editTopicViewModel: EditTopicViewModel = EditTopicViewModel(),
 ) {
     Scaffold(
         topBar = {
@@ -52,10 +61,19 @@ fun EditTopicViewTopAppBar(
                     }
                 },
                 actions = {
-                    if (viewModel.isModified) {
+                    if (editTopicViewModel.isModified) {
                         IconButton(
                             onClick = {
-
+                                Log.d(TAG, "You clicked add topic: ${editTopicViewModel.topicTitle}")
+                                topicViewModel.addTopic(
+                                    Topic(
+                                        title = editTopicViewModel.topicTitle,
+                                        content = editTopicViewModel.topicContent,
+                                        lastModified = Date(),
+                                        lastPlayback = Date(),
+                                    )
+                                )
+                                navController.popBackStack()
                             },
                         ) {
                             Icon(
@@ -72,8 +90,8 @@ fun EditTopicViewTopAppBar(
                 Modifier.padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                TopicTitleTextField(viewModel)
-                TopicContentTextField(viewModel)
+                TopicTitleTextField(editTopicViewModel)
+                TopicContentTextField(editTopicViewModel)
             }
         }
     )

@@ -16,7 +16,7 @@ import java.util.Date
 @Entity
 data class Topic(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int = 0,
     val title: String,
     val lastModified: Date,
     val lastPlayback: Date,
