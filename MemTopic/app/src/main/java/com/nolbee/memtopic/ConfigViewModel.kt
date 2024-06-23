@@ -5,27 +5,36 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 
-class ConfigViewModel(private val application: Application) : AndroidViewModel(application) {
-    private var secureStore: SecureKeyValueStore? = null
 
-    fun initSecureStore() {
-        secureStore = SecureKeyValueStore(application)
-        gcpTextToSpeechToken = loadGcpTextToSpeechToken()
+open class ConfigViewModelInterface(application: Application) : AndroidViewModel(application) {
+    open var gcpTextToSpeechToken by mutableStateOf("")
+        protected set
+    open var gcpIsTextToSpeechTokenModified by mutableStateOf(true)
+        protected set
+
+    open fun updateGcpTextToSpeechToken(newToken: String) {
+        gcpTextToSpeechToken = newToken
     }
 
-    var gcpTextToSpeechToken by mutableStateOf("")
-        private set
+    open fun saveGcpTextToSpeechToken() {}
+}
 
-    var gcpIsTextToSpeechTokenModified by mutableStateOf(false)
-        private set
+class ConfigViewModel(application: Application) : ConfigViewModelInterface(application) {
+    private val secureStore: SecureKeyValueStore? = SecureKeyValueStore(application)
 
-    fun updateGcpTextToSpeechToken(newToken: String) {
+    override var gcpTextToSpeechToken by mutableStateOf(loadGcpTextToSpeechToken())
+
+    override var gcpIsTextToSpeechTokenModified by mutableStateOf(false)
+
+    override fun updateGcpTextToSpeechToken(newToken: String) {
         gcpTextToSpeechToken = newToken
         gcpIsTextToSpeechTokenModified = gcpTextToSpeechToken != loadGcpTextToSpeechToken()
     }
 
-    open fun saveGcpTextToSpeechToken() {
+    override fun saveGcpTextToSpeechToken() {
         secureStore?.set("gcpTextToSpeechToken", gcpTextToSpeechToken)
         gcpIsTextToSpeechTokenModified = false
     }
@@ -34,3 +43,15 @@ class ConfigViewModel(private val application: Application) : AndroidViewModel(a
         return secureStore?.get("gcpTextToSpeechToken") ?: ""
     }
 }
+
+class ConfigViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ConfigViewModel::class.java)) {
+            val viewModel = ConfigViewModel(application)
+            return modelClass.cast(viewModel)
+                ?: throw IllegalArgumentException("Cannot cast to ConfigViewModel")
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
