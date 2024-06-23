@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun GoogleCloudConfigView(viewModel: ConfigViewModelInterface) {
+fun GoogleCloudAccountView(viewModel: AccountViewModelInterface) {
     Box(
         Modifier
             .fillMaxWidth()
@@ -52,7 +52,7 @@ fun GoogleCloudConfigView(viewModel: ConfigViewModelInterface) {
 }
 
 @Composable
-private fun TTSTokenTextField(viewModel: ConfigViewModelInterface) {
+private fun TTSTokenTextField(viewModel: AccountViewModelInterface) {
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     TextField(
         value = viewModel.gcpTextToSpeechToken,
@@ -76,6 +76,6 @@ private fun TTSTokenTextField(viewModel: ConfigViewModelInterface) {
 @Preview
 @Composable
 private fun GoogleCloudConfigViewPreview() {
-    val viewModel = ConfigViewModelInterface(Application())
-    GoogleCloudConfigView(viewModel)
+    val viewModel = AccountViewModelInterface(Application())
+    GoogleCloudAccountView(viewModel)
 }

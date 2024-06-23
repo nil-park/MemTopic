@@ -25,10 +25,10 @@ import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConfigViewTopAppBar(
+fun AccountViewTopAppBar(
     onClickNavigationIcon: () -> Unit = {},
-    viewModel: ConfigViewModelInterface = viewModel(
-        factory = ConfigViewModelFactory(LocalContext.current.applicationContext as Application)
+    viewModel: AccountViewModelInterface = viewModel(
+        factory = AccountViewModelFactory(LocalContext.current.applicationContext as Application)
     )
 ) {
     Scaffold(
@@ -70,7 +70,7 @@ fun ConfigViewTopAppBar(
                 Modifier.padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                GoogleCloudConfigView(viewModel)
+                GoogleCloudAccountView(viewModel)
             }
         }
     )
@@ -80,6 +80,6 @@ fun ConfigViewTopAppBar(
 @Composable
 fun ConfigViewTopAppBarPreview() {
     MemTopicTheme {
-        ConfigViewTopAppBar(viewModel = ConfigViewModelInterface(Application()))
+        AccountViewTopAppBar(viewModel = AccountViewModelInterface(Application()))
     }
 }

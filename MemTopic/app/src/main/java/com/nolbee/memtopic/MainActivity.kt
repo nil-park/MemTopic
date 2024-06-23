@@ -73,7 +73,7 @@ fun MainView(
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None }
                 ) {
-                    ConfigViewTopAppBar(onClickNavigationIcon = onClickNavigationIcon)
+                    AccountViewTopAppBar(onClickNavigationIcon = onClickNavigationIcon)
                 }
                 composable(
                     "TopicList",

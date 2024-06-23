@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 
-open class ConfigViewModelInterface(application: Application) : AndroidViewModel(application) {
+open class AccountViewModelInterface(application: Application) : AndroidViewModel(application) {
     open var gcpTextToSpeechToken by mutableStateOf("")
         protected set
     open var gcpIsTextToSpeechTokenModified by mutableStateOf(true)
@@ -22,7 +22,7 @@ open class ConfigViewModelInterface(application: Application) : AndroidViewModel
     open fun saveGcpTextToSpeechToken() {}
 }
 
-class ConfigViewModel(application: Application) : ConfigViewModelInterface(application) {
+class AccountViewModel(application: Application) : AccountViewModelInterface(application) {
     private val secureStore: SecureKeyValueStore? = SecureKeyValueStore(application)
 
     override var gcpTextToSpeechToken by mutableStateOf(loadGcpTextToSpeechToken())
@@ -44,10 +44,10 @@ class ConfigViewModel(application: Application) : ConfigViewModelInterface(appli
     }
 }
 
-class ConfigViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+class AccountViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ConfigViewModel::class.java)) {
-            val viewModel = ConfigViewModel(application)
+        if (modelClass.isAssignableFrom(AccountViewModel::class.java)) {
+            val viewModel = AccountViewModel(application)
             return modelClass.cast(viewModel)
                 ?: throw IllegalArgumentException("Cannot cast to ConfigViewModel")
         }
