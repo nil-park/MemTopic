@@ -1,4 +1,4 @@
-package com.nolbee.memtopic
+package com.nolbee.memtopic.edit_topic_view
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.database.TopicRepository
 import com.nolbee.memtopic.database.TopicViewModel
+import com.nolbee.memtopic.topic_list_view.MockTopicDao
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import java.util.Date
 

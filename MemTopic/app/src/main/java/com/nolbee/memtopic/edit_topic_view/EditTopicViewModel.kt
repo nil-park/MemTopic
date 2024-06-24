@@ -1,4 +1,4 @@
-package com.nolbee.memtopic
+package com.nolbee.memtopic.edit_topic_view
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

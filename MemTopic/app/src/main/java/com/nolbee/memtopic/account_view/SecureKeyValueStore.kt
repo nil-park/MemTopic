@@ -1,4 +1,4 @@
-package com.nolbee.memtopic
+package com.nolbee.memtopic.account_view
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec

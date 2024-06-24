@@ -1,4 +1,4 @@
-package com.nolbee.memtopic
+package com.nolbee.memtopic.topic_list_view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +24,7 @@ import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.database.TopicDao
 import com.nolbee.memtopic.database.TopicRepository
 import com.nolbee.memtopic.database.TopicViewModel
+import com.nolbee.memtopic.edit_topic_view.EditTopicViewModel
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

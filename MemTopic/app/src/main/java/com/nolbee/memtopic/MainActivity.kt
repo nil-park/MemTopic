@@ -15,9 +15,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.nolbee.memtopic.account_view.AccountViewTopAppBar
 import com.nolbee.memtopic.database.TopicDatabase
 import com.nolbee.memtopic.database.TopicRepository
 import com.nolbee.memtopic.database.TopicViewModel
+import com.nolbee.memtopic.edit_topic_view.EditTopicViewTopAppBar
+import com.nolbee.memtopic.topic_list_view.MockTopicDao
+import com.nolbee.memtopic.topic_list_view.TopicListTopAppBar
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
 class TopicViewModelFactory(private val repository: TopicRepository) : ViewModelProvider.Factory {

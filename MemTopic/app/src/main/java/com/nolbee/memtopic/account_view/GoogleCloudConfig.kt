@@ -1,4 +1,4 @@
-package com.nolbee.memtopic
+package com.nolbee.memtopic.account_view
 
 import android.app.Application
 import androidx.compose.foundation.layout.Box

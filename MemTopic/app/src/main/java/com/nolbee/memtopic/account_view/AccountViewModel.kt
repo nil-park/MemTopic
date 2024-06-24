@@ -1,4 +1,4 @@
-package com.nolbee.memtopic
+package com.nolbee.memtopic.account_view
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -54,4 +54,3 @@ class AccountViewModelFactory(private val application: Application) : ViewModelP
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
