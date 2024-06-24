@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopicListTopAppBar(
-    onClickNavigationIcon: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
     topicViewModel: TopicViewModel = TopicViewModel(TopicRepository(MockTopicDao())),
     editTopicViewModel: EditTopicViewModel = EditTopicViewModel()
@@ -46,14 +44,6 @@ fun TopicListTopAppBar(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onClickNavigationIcon) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = null
-                        )
-                    }
                 },
                 actions = {
                     IconButton(onClick = {

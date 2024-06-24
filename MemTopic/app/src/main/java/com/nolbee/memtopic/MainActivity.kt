@@ -8,7 +8,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -20,7 +19,6 @@ import com.nolbee.memtopic.database.TopicDatabase
 import com.nolbee.memtopic.database.TopicRepository
 import com.nolbee.memtopic.database.TopicViewModel
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
-import kotlinx.coroutines.launch
 
 class TopicViewModelFactory(private val repository: TopicRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -60,9 +58,7 @@ fun MainView(
     topicViewModel: TopicViewModel = TopicViewModel(TopicRepository(MockTopicDao()))
 ) {
     val navController = rememberNavController()
-    val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val onClickNavigationIcon: () -> Unit = { scope.launch { drawerState.open() } }
     ModalNavigationDrawerMain(
         drawerState = drawerState,
         navController = navController,
@@ -73,7 +69,7 @@ fun MainView(
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None }
                 ) {
-                    AccountViewTopAppBar(onClickNavigationIcon = onClickNavigationIcon)
+                    AccountViewTopAppBar()
                 }
                 composable(
                     "TopicList",
@@ -81,7 +77,6 @@ fun MainView(
                     exitTransition = { ExitTransition.None }
                 ) {
                     TopicListTopAppBar(
-                        onClickNavigationIcon = onClickNavigationIcon,
                         navController = navController,
                         topicViewModel = topicViewModel,
                     )
@@ -92,7 +87,6 @@ fun MainView(
                     exitTransition = { ExitTransition.None }
                 ) {
                     EditTopicViewTopAppBar(
-                        onClickNavigationIcon = onClickNavigationIcon,
                         navController = navController,
                         topicViewModel = topicViewModel,
                     )

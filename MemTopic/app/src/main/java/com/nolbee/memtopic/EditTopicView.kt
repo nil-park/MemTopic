@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,7 +36,6 @@ private const val TAG = "AddTopicView"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTopicViewTopAppBar(
-    onClickNavigationIcon: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
     topicViewModel: TopicViewModel = TopicViewModel(TopicRepository(MockTopicDao())),
     editTopicViewModel: EditTopicViewModel = EditTopicViewModel(),
@@ -52,19 +50,14 @@ fun EditTopicViewTopAppBar(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = onClickNavigationIcon) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = null
-                        )
-                    }
-                },
                 actions = {
                     if (editTopicViewModel.isModified) {
                         IconButton(
                             onClick = {
-                                Log.d(TAG, "You clicked add topic: ${editTopicViewModel.topicTitle}")
+                                Log.d(
+                                    TAG,
+                                    "You clicked add topic: ${editTopicViewModel.topicTitle}"
+                                )
                                 topicViewModel.addTopic(
                                     Topic(
                                         title = editTopicViewModel.topicTitle,
@@ -122,7 +115,9 @@ private fun TopicContentTextField(viewModel: EditTopicViewModel) {
     TextField(
         value = viewModel.topicContent,
         onValueChange = { viewModel.updateContent(it) },
-        modifier = Modifier.fillMaxSize(1f).verticalScroll(scrollState),
+        modifier = Modifier
+            .fillMaxSize(1f)
+            .verticalScroll(scrollState),
         singleLine = false,
         label = { Text("내용") },  // TODO: replace this string with a string resource to achieve multi-language support.
         visualTransformation = VisualTransformation.None,

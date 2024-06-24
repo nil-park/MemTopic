@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,7 +25,6 @@ import com.nolbee.memtopic.ui.theme.MemTopicTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountViewTopAppBar(
-    onClickNavigationIcon: () -> Unit = {},
     viewModel: AccountViewModelInterface = viewModel(
         factory = AccountViewModelFactory(LocalContext.current.applicationContext as Application)
     )
@@ -40,14 +38,6 @@ fun AccountViewTopAppBar(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onClickNavigationIcon) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = null
-                        )
-                    }
                 },
                 actions = {
                     if (viewModel.gcpIsTextToSpeechTokenModified) {
