@@ -9,7 +9,6 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,21 +18,11 @@ import com.nolbee.memtopic.account_view.AccountViewTopAppBar
 import com.nolbee.memtopic.database.TopicDatabase
 import com.nolbee.memtopic.database.TopicRepository
 import com.nolbee.memtopic.database.TopicViewModel
+import com.nolbee.memtopic.database.TopicViewModelFactory
 import com.nolbee.memtopic.edit_topic_view.EditTopicViewTopAppBar
 import com.nolbee.memtopic.topic_list_view.MockTopicDao
 import com.nolbee.memtopic.topic_list_view.TopicListTopAppBar
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
-
-class TopicViewModelFactory(private val repository: TopicRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TopicViewModel::class.java)) {
-            val viewModel = TopicViewModel(repository)
-            return modelClass.cast(viewModel)
-                ?: throw IllegalArgumentException("Cannot cast to ConfigViewModel")
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
