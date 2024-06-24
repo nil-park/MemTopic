@@ -23,12 +23,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.nolbee.memtopic.database.ITopicViewModel
+import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.Topic
-import com.nolbee.memtopic.database.TopicRepository
 import com.nolbee.memtopic.database.TopicViewModel
-import com.nolbee.memtopic.topic_list_view.MockTopicDao
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import java.util.Date
 
@@ -38,7 +39,7 @@ private const val TAG = "AddTopicView"
 @Composable
 fun EditTopicViewTopAppBar(
     navController: NavHostController = rememberNavController(),
-    topicViewModel: TopicViewModel = TopicViewModel(TopicRepository(MockTopicDao())),
+    topicViewModel: ITopicViewModel = hiltViewModel<TopicViewModel>(),
     editTopicViewModel: EditTopicViewModel = EditTopicViewModel(),
 ) {
     Scaffold(
@@ -129,6 +130,8 @@ private fun TopicContentTextField(viewModel: EditTopicViewModel) {
 @Composable
 fun EditTopicPreview() {
     MemTopicTheme {
-        EditTopicViewTopAppBar()
+        EditTopicViewTopAppBar(
+            topicViewModel = MockTopicViewModel()
+        )
     }
 }

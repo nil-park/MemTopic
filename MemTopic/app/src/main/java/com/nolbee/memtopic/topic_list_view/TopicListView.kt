@@ -18,22 +18,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.nolbee.memtopic.database.Topic
-import com.nolbee.memtopic.database.TopicDao
-import com.nolbee.memtopic.database.TopicRepository
+import com.nolbee.memtopic.database.ITopicViewModel
+import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.TopicViewModel
 import com.nolbee.memtopic.edit_topic_view.EditTopicViewModel
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopicListTopAppBar(
     navController: NavHostController = rememberNavController(),
-    topicViewModel: TopicViewModel = TopicViewModel(TopicRepository(MockTopicDao())),
+    topicViewModel: ITopicViewModel = hiltViewModel<TopicViewModel>(),
     editTopicViewModel: EditTopicViewModel = EditTopicViewModel()
 ) {
     Scaffold(
@@ -69,7 +67,7 @@ fun TopicListTopAppBar(
 }
 
 @Composable
-private fun TopicList(viewModel: TopicViewModel, innerPadding: PaddingValues) {
+private fun TopicList(viewModel: ITopicViewModel, innerPadding: PaddingValues) {
     val topics by viewModel.topics.collectAsState(initial = emptyList())
 
     LazyColumn(
@@ -86,16 +84,8 @@ private fun TopicList(viewModel: TopicViewModel, innerPadding: PaddingValues) {
 @Composable
 fun TopicListTopAppBarPreview() {
     MemTopicTheme {
-        TopicListTopAppBar()
+        TopicListTopAppBar(
+            topicViewModel = MockTopicViewModel()
+        )
     }
 }
-
-class MockTopicDao : TopicDao {
-    private val topics = listOf(sampleTopic00, sampleTopic01)
-    override suspend fun upsertTopic(topic: Topic) {}
-    override suspend fun deleteTopic(topic: Topic) {}
-    override fun selectTopicByName(): Flow<List<Topic>> = flowOf(topics)
-    override fun selectTopicByLastModified(): Flow<List<Topic>> = flowOf(topics)
-    override fun selectTopicByLastPlayback(): Flow<List<Topic>> = flowOf(topics)
-}
-
