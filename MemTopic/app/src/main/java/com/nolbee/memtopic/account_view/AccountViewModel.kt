@@ -5,24 +5,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
+interface IAccountViewModel {
+    var gcpTextToSpeechToken: String
+    var gcpIsTextToSpeechTokenModified: Boolean
+    fun updateGcpTextToSpeechToken(newToken: String)
+    fun saveGcpTextToSpeechToken()
 
-open class AccountViewModelInterface(application: Application) : AndroidViewModel(application) {
-    open var gcpTextToSpeechToken by mutableStateOf("")
-        protected set
-    open var gcpIsTextToSpeechTokenModified by mutableStateOf(true)
-        protected set
-
-    open fun updateGcpTextToSpeechToken(newToken: String) {
-        gcpTextToSpeechToken = newToken
-    }
-
-    open fun saveGcpTextToSpeechToken() {}
 }
 
-class AccountViewModel(application: Application) : AccountViewModelInterface(application) {
+@HiltViewModel
+class AccountViewModel @Inject constructor(
+    application: Application
+) : AndroidViewModel(application), IAccountViewModel {
     private val secureStore: SecureKeyValueStore? = SecureKeyValueStore(application)
 
     override var gcpTextToSpeechToken by mutableStateOf(loadGcpTextToSpeechToken())
@@ -44,13 +41,9 @@ class AccountViewModel(application: Application) : AccountViewModelInterface(app
     }
 }
 
-class AccountViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AccountViewModel::class.java)) {
-            val viewModel = AccountViewModel(application)
-            return modelClass.cast(viewModel)
-                ?: throw IllegalArgumentException("Cannot cast to ConfigViewModel")
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
+class MockAccountViewModel() : IAccountViewModel {
+    override var gcpTextToSpeechToken = "This is sample token"
+    override var gcpIsTextToSpeechTokenModified = true
+    override fun updateGcpTextToSpeechToken(newToken: String) {}
+    override fun saveGcpTextToSpeechToken() {}
 }

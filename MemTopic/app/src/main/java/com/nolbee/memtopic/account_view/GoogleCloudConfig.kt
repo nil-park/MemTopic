@@ -1,6 +1,5 @@
 package com.nolbee.memtopic.account_view
 
-import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +27,9 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun GoogleCloudAccountView(viewModel: AccountViewModelInterface) {
+fun GoogleCloudAccountView(
+    viewModel: IAccountViewModel
+) {
     Box(
         Modifier
             .fillMaxWidth()
@@ -52,7 +53,7 @@ fun GoogleCloudAccountView(viewModel: AccountViewModelInterface) {
 }
 
 @Composable
-private fun TTSTokenTextField(viewModel: AccountViewModelInterface) {
+private fun TTSTokenTextField(viewModel: IAccountViewModel) {
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     TextField(
         value = viewModel.gcpTextToSpeechToken,
@@ -76,6 +77,5 @@ private fun TTSTokenTextField(viewModel: AccountViewModelInterface) {
 @Preview
 @Composable
 private fun GoogleCloudConfigViewPreview() {
-    val viewModel = AccountViewModelInterface(Application())
-    GoogleCloudAccountView(viewModel)
+    GoogleCloudAccountView(MockAccountViewModel())
 }
