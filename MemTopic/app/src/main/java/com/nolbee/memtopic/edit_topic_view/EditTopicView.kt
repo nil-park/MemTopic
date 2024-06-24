@@ -68,7 +68,7 @@ fun EditTopicViewTopAppBar(
                                         lastPlayback = Date(),
                                     )
                                 )
-                                navController.popBackStack()
+                                navController.navigateUp()
                             },
                         ) {
                             Icon(
