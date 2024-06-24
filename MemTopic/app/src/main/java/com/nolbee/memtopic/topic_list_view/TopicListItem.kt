@@ -53,7 +53,7 @@ fun TopicListItem(topic: Topic) {
                                 "en-US",
                                 "en-US-Neural2-J"
                             )
-                            val audioBase64 = client.Synthesize(topic.content)
+                            val audioBase64 = client.synthesize(topic.content)
                             withContext(Dispatchers.Main) {
                                 play(audioBase64)
                             }
