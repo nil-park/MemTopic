@@ -1,5 +1,5 @@
 # MemTopic
-An app for improving memory retention utilized by TTS engine.
+An app designed to enhance your memory retention and presentation skills using TTS and generative AI. By leveraging advanced Text-to-Speech (TTS) technology and AI-generated questions and answers, this app provides an interactive and effective learning experience. Users can create, edit, and search for topics, configure personalized TTS settings, and engage with AI-generated content to improve recall and articulation.
 
 # User Scenario
 ## Use Case 1
