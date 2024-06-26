@@ -18,21 +18,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
-import com.nolbee.memtopic.database.TopicViewModel
-import com.nolbee.memtopic.edit_topic_view.EditTopicViewModel
+import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopicListTopAppBar(
-    navController: NavHostController = rememberNavController(),
-    topicViewModel: ITopicViewModel = hiltViewModel<TopicViewModel>(),
-    editTopicViewModel: EditTopicViewModel = EditTopicViewModel()
+    navController: NavHostController,
+    topicViewModel: ITopicViewModel,
 ) {
     Scaffold(
         topBar = {
@@ -46,7 +44,9 @@ fun TopicListTopAppBar(
                 },
                 actions = {
                     IconButton(onClick = {
-                        editTopicViewModel.prepareAddNewTopic()
+                        topicViewModel.topicToEdit = Topic(
+                            title = "", content = "", lastModified = Date(), lastPlayback = Date()
+                        )
                         navController.navigate("EditTopicView")
                     }) {
                         Icon(
@@ -59,7 +59,8 @@ fun TopicListTopAppBar(
         },
         content = { innerPadding ->
             TopicList(
-                viewModel = topicViewModel,
+                navController = navController,
+                topicViewModel = topicViewModel,
                 innerPadding = innerPadding,
             )
         }
@@ -67,15 +68,23 @@ fun TopicListTopAppBar(
 }
 
 @Composable
-private fun TopicList(viewModel: ITopicViewModel, innerPadding: PaddingValues) {
-    val topics by viewModel.topics.collectAsState(initial = emptyList())
+private fun TopicList(
+    navController: NavHostController,
+    topicViewModel: ITopicViewModel,
+    innerPadding: PaddingValues
+) {
+    val topics by topicViewModel.topics.collectAsState(initial = emptyList())
 
     LazyColumn(
         contentPadding = innerPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(topics) { topic ->
-            TopicListItem(topic = topic)
+            TopicListItem(
+                topic = topic,
+                navController = navController,
+                topicViewModel = topicViewModel,
+            )
         }
     }
 }
@@ -85,6 +94,7 @@ private fun TopicList(viewModel: ITopicViewModel, innerPadding: PaddingValues) {
 fun TopicListTopAppBarPreview() {
     MemTopicTheme {
         TopicListTopAppBar(
+            navController = rememberNavController(),
             topicViewModel = MockTopicViewModel()
         )
     }

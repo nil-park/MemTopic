@@ -52,7 +52,7 @@ private fun NavigationContentSample() {
 fun ModalNavigationDrawerMain(
     drawerState: DrawerState,
     navController: NavHostController,
-    navHost: @Composable () -> Unit = { NavigationContentSample() },
+    navHost: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     ModalNavigationDrawer(
@@ -113,6 +113,7 @@ fun ModalNavigationDrawerMain(
         }
     )
 }
+
 @Composable
 fun NavController.getCurrentRoute(): String? {
     val navBackStackEntry by currentBackStackEntryAsState()
@@ -132,7 +133,7 @@ fun ModalNavigationDrawerMainPreview() {
                 NavHost(navController = navController, startDestination = "TopicList") {
                     composable("ConfigView") { NavigationContentSample() }
                     composable("TopicList") { NavigationContentSample() }
-                    composable("EditTopicView") { NavigationContentSample()}
+                    composable("EditTopicView") { NavigationContentSample() }
                 }
             }
         )

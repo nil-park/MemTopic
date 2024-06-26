@@ -21,8 +21,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.account_view.SecureKeyValueStore
 import com.nolbee.memtopic.client.TextToSpeechGCP
+import com.nolbee.memtopic.database.ITopicViewModel
+import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.database.sampleTopic00
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
@@ -32,7 +36,11 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 
 @Composable
-fun TopicListItem(topic: Topic) {
+fun TopicListItem(
+    topic: Topic,
+    navController: NavHostController,
+    topicViewModel: ITopicViewModel,
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     Column {
@@ -46,7 +54,12 @@ fun TopicListItem(topic: Topic) {
                 )
             },
             trailingContent = {
-                Icon(Icons.Filled.Edit, contentDescription = null)
+                IconButton(onClick = {
+                    topicViewModel.topicToEdit = topic
+                    navController.navigate("EditTopicView")
+                }) {
+                    Icon(Icons.Filled.Edit, contentDescription = null)
+                }
             },
             leadingContent = {
                 IconButton(onClick = {
@@ -84,7 +97,11 @@ fun TopicListItem(topic: Topic) {
 @Composable
 fun TopicListItemPreview() {
     MemTopicTheme {
-        TopicListItem(sampleTopic00)
+        TopicListItem(
+            topic = sampleTopic00,
+            navController = rememberNavController(),
+            topicViewModel = MockTopicViewModel(),
+        )
     }
 }
 

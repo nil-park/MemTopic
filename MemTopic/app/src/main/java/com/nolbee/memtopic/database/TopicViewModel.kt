@@ -1,6 +1,9 @@
 package com.nolbee.memtopic.database
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.Room
@@ -11,9 +14,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,7 +45,8 @@ object TopicDatabaseModule {
 
 interface ITopicViewModel {
     val topics: Flow<List<Topic>>
-    fun addTopic(topic: Topic)
+    var topicToEdit: Topic
+    fun upsertTopic(topic: Topic)
     fun deleteTopic(topic: Topic)
 }
 
@@ -52,9 +59,13 @@ class TopicViewModel @Inject constructor(
 
     override val topics: Flow<List<Topic>> = sortType.flatMapLatest { sort ->
         repository.getTopicList(sort)
-    }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    override fun addTopic(topic: Topic) {
+    override var topicToEdit: Topic by mutableStateOf(
+        Topic(title = "", content = "", lastModified = Date(), lastPlayback = Date())
+    )
+
+    override fun upsertTopic(topic: Topic) {
         viewModelScope.launch {
             repository.upsertTopic(topic)
         }
@@ -72,7 +83,10 @@ class MockTopicViewModel : ViewModel(), ITopicViewModel {
         listOf(sampleTopic00, sampleTopic01)
     )
     override val topics: Flow<List<Topic>> = _topics.asStateFlow()
-    override fun addTopic(topic: Topic) {}
+    override var topicToEdit = Topic(
+        title = "", content = "", lastModified = Date(), lastPlayback = Date()
+    )
 
+    override fun upsertTopic(topic: Topic) {}
     override fun deleteTopic(topic: Topic) {}
 }
