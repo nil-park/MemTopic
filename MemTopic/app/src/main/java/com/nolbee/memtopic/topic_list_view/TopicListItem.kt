@@ -8,7 +8,9 @@ import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
@@ -54,20 +56,26 @@ fun TopicListItem(
                 )
             },
             trailingContent = {
-                IconButton(onClick = {
-                    topicViewModel.topicToEdit = topic
-                    navController.navigate("EditTopicView")
-                }) {
-                    Icon(Icons.Filled.Edit, contentDescription = null)
+                Row {
+                    IconButton(onClick = {
+                        topicViewModel.topicToEdit = topic
+                        navController.navigate("EditTopicView")
+                    }) {
+                        Icon(Icons.Filled.Edit, contentDescription = null)
+                    }
+                    IconButton(onClick = {
+                        topicViewModel.deleteTopic(topic) // TODO: 좀 물어 보고 지워라
+                    }) {
+                        Icon(Icons.Filled.Delete, contentDescription = null)
+                    }
                 }
             },
             leadingContent = {
                 IconButton(onClick = {
+                    // TODO: Composable 상태를 disable로 만들기
                     coroutineScope.launch {
                         try {
-                            // TODO: play는 여기서 할 것이 아님...
                             val keyValueStore = SecureKeyValueStore(context)
-                            // TODO: Topic에 음성 프로파일 선택 기능 넣기
                             val client = TextToSpeechGCP(
                                 keyValueStore.get("gcpTextToSpeechToken") ?: "",
                                 "en-US",
@@ -81,6 +89,7 @@ fun TopicListItem(
                             }
                         } catch (e: Exception) {
                             Log.d("GCPTest", "Error from synthesize(): $e")
+                            // TODO: 에러 팝업
                         }
                     }
                 }) {
