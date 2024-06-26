@@ -1,114 +1,92 @@
 package com.nolbee.memtopic.database
 
+import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Room
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TopicViewModel(
-    private val dao: TopicDao
-) : ViewModel() {
-    private val _sortType = MutableStateFlow(TopicSortType.LAST_PLAYBACK)
-    private val _topics = _sortType
-        .flatMapLatest { sortType ->
-            when (sortType) {
-                TopicSortType.NAME -> dao.selectTopicByName()
-                TopicSortType.LAST_MODIFIED -> dao.selectTopicByLastModified()
-                TopicSortType.LAST_PLAYBACK -> dao.selectTopicByLastPlayback()
-            }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    private val _state = MutableStateFlow(TopicState())
-    val state = combine(_state, _sortType, _topics) { state, sortType, topics ->
-        state.copy(
-            topics = topics,
-            sortType = sortType
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TopicState())
+@Module
+@InstallIn(SingletonComponent::class)
+object TopicDatabaseModule {
+    @Provides
+    @Singleton
+    fun provideDatabase(app: Application): TopicDatabase {
+        return Room.databaseBuilder(app, TopicDatabase::class.java, "topicDatabase").build()
+    }
 
-    fun onEvent(event: TopicEvent) {
-        when (event) {
-            is TopicEvent.DeleteTopic -> {
-                viewModelScope.launch {
-                    dao.deleteTopic(event.topic)
-                }
-            }
+    @Provides
+    fun provideTopicDao(db: TopicDatabase): TopicDao {
+        return db.topicDao()
+    }
 
-            TopicEvent.HideDialog -> {
-                _state.update {
-                    it.copy(
-                        isAddingTopic = false
-                    )
-                }
-            }
+    @Provides
+    fun provideTopicRepository(topicDao: TopicDao): TopicRepository {
+        return TopicRepository(topicDao)
+    }
+}
 
-            TopicEvent.SaveTopic -> {
-                val name = state.value.name
-                val lastModified = state.value.lastModified
-                val lastPlayback = state.value.lastPlayback
-                if (name.isBlank()) {
-                    return
-                }
-                val topic = Topic(
-                    name = name,
-                    lastModified = lastModified,
-                    lastPlayback = lastPlayback,
-                    content = ""
-                )
-                viewModelScope.launch {
-                    dao.upsertTopic(topic)
-                }
-                _state.update {
-                    it.copy(
-                        isAddingTopic = false,
-                        name = "",
-                        lastModified = Date(),
-                        lastPlayback = Date()
-                    )
-                }
-            }
+interface ITopicViewModel {
+    val topics: Flow<List<Topic>>
+    var topicToEdit: Topic
+    fun upsertTopic(topic: Topic)
+    fun deleteTopic(topic: Topic)
+}
 
-            is TopicEvent.SetLastModified -> {
-                _state.update {
-                    it.copy(
-                        lastModified = event.date
-                    )
-                }
-            }
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class TopicViewModel @Inject constructor(
+    private val repository: TopicRepository
+) : ViewModel(), ITopicViewModel {
+    private val sortType = MutableStateFlow(TopicSortType.LAST_PLAYBACK)
 
-            is TopicEvent.SetLastPlayback -> {
-                _state.update {
-                    it.copy(
-                        lastPlayback = event.date
-                    )
-                }
-            }
+    override val topics: Flow<List<Topic>> = sortType.flatMapLatest { sort ->
+        repository.getTopicList(sort)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-            is TopicEvent.SetName -> {
-                _state.update {
-                    it.copy(
-                        name = event.name
-                    )
-                }
-            }
+    override var topicToEdit: Topic by mutableStateOf(
+        Topic(title = "", content = "", lastModified = Date(), lastPlayback = Date())
+    )
 
-            TopicEvent.ShowDialog -> {
-                _state.update {
-                    it.copy(
-                        isAddingTopic = true
-                    )
-                }
-            }
-
-            is TopicEvent.SortTopic -> {
-                _sortType.value = event.sortType
-            }
+    override fun upsertTopic(topic: Topic) {
+        viewModelScope.launch {
+            repository.upsertTopic(topic)
         }
     }
+
+    override fun deleteTopic(topic: Topic) {
+        viewModelScope.launch {
+            repository.deleteTopic(topic)
+        }
+    }
+}
+
+class MockTopicViewModel : ViewModel(), ITopicViewModel {
+    private val _topics = MutableStateFlow(
+        listOf(sampleTopic00, sampleTopic01)
+    )
+    override val topics: Flow<List<Topic>> = _topics.asStateFlow()
+    override var topicToEdit = Topic(
+        title = "", content = "", lastModified = Date(), lastPlayback = Date()
+    )
+
+    override fun upsertTopic(topic: Topic) {}
+    override fun deleteTopic(topic: Topic) {}
 }

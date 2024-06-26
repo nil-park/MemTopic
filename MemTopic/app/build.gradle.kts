@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -72,12 +73,29 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // ktor dependencies
+    val ktorVersion = "2.3.11"
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-auth:$ktorVersion")
+
+    // other dependencies
+    implementation("com.google.code.gson:gson:2.11.0")
+
+    // hilt
+    val hiltVersion = "2.51.1"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // core
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
