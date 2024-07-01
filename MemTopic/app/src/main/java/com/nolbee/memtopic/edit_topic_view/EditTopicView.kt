@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.Topic
+import com.nolbee.memtopic.dialog_view.AlertAndConfirmView
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import java.util.Date
 
@@ -37,6 +38,22 @@ fun EditTopicViewTopAppBar(
     topicViewModel: ITopicViewModel,
     editTopicViewModel: EditTopicViewModel,
 ) {
+    AlertAndConfirmView(
+        if (editTopicViewModel.isNew) "Do you really want to add a new topic \"${editTopicViewModel.topicTitle}\"?" else "Do you really want to edit topic \"${editTopicViewModel.topicTitle}\"?",  // TODO: line is too long and the text is not from string resources
+        editTopicViewModel,
+        onConfirm = {
+            topicViewModel.upsertTopic(
+                Topic(
+                    id = editTopicViewModel.topicRef.id,
+                    title = editTopicViewModel.topicTitle,
+                    content = editTopicViewModel.topicContent,
+                    lastModified = Date(),
+                    lastPlayback = editTopicViewModel.topicRef.lastPlayback,
+                )
+            )
+            navController.navigateUp()
+        }
+    )
     Scaffold(
         topBar = {
             TopAppBar(
@@ -51,16 +68,7 @@ fun EditTopicViewTopAppBar(
                     if (editTopicViewModel.isModified) {
                         IconButton(
                             onClick = {
-                                topicViewModel.upsertTopic(
-                                    Topic(
-                                        id = editTopicViewModel.topicRef.id,
-                                        title = editTopicViewModel.topicTitle,
-                                        content = editTopicViewModel.topicContent,
-                                        lastModified = Date(),
-                                        lastPlayback = editTopicViewModel.topicRef.lastPlayback,
-                                    )
-                                )
-                                navController.navigateUp()
+                                editTopicViewModel.openAlertAndConfirmDialog = true
                             },
                         ) {
                             Icon(
