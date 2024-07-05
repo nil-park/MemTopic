@@ -2,32 +2,43 @@ package com.nolbee.memtopic.edit_topic_view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.nolbee.memtopic.R
 import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.Topic
-import com.nolbee.memtopic.dialog_view.AlertAndConfirmView
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import java.util.Date
 
@@ -38,9 +49,15 @@ fun EditTopicViewTopAppBar(
     topicViewModel: ITopicViewModel,
     editTopicViewModel: EditTopicViewModel,
 ) {
-    AlertAndConfirmView(
-        if (editTopicViewModel.isNew) "Do you really want to add a new topic \"${editTopicViewModel.topicTitle}\"?" else "Do you really want to edit topic \"${editTopicViewModel.topicTitle}\"?",  // TODO: line is too long and the text is not from string resources
-        editTopicViewModel,
+    val confirmMessage = if (editTopicViewModel.isNew) {
+        stringResource(R.string.add_new_topic_confirm, editTopicViewModel.topicTitle)
+    } else {
+        stringResource(R.string.edit_topic_confirm, editTopicViewModel.topicTitle)
+    }
+
+    ConfirmView(
+        content = confirmMessage,
+        vm = editTopicViewModel,
         onConfirm = {
             topicViewModel.upsertTopic(
                 Topic(
@@ -54,6 +71,7 @@ fun EditTopicViewTopAppBar(
             navController.navigateUp()
         }
     )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,7 +86,7 @@ fun EditTopicViewTopAppBar(
                     if (editTopicViewModel.isModified) {
                         IconButton(
                             onClick = {
-                                editTopicViewModel.openAlertAndConfirmDialog = true
+                                editTopicViewModel.isOpenConfirmDialog = true
                             },
                         ) {
                             Icon(
@@ -102,12 +120,6 @@ private fun TopicTitleTextField(editTopicViewModel: EditTopicViewModel) {
         singleLine = true,
         label = { Text("제목") },  // TODO: replace this string with a string resource to achieve multi-language support.
         visualTransformation = VisualTransformation.None,
-        trailingIcon = {
-            if (editTopicViewModel.isNew) {
-                // TODO: 제목의 유일성을 검사해서 아이콘을 바꿔주기
-//                Icon(imageVector = Icons.Filled.Warning , contentDescription = null, tint = Color.Red)
-            }
-        },
     )
 }
 
@@ -134,6 +146,60 @@ fun EditTopicPreview() {
             navController = rememberNavController(),
             topicViewModel = MockTopicViewModel(),
             editTopicViewModel = EditTopicViewModel()
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ConfirmView(
+    content: String,
+    vm: EditTopicViewModel,
+    onConfirm: () -> Unit,
+) {
+    if (vm.isOpenConfirmDialog) {
+        BasicAlertDialog(
+            onDismissRequest = {
+                vm.isOpenConfirmDialog = false
+            }
+        ) {
+            Surface(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = AlertDialogDefaults.TonalElevation
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = content,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    TextButton(
+                        onClick = {
+                            onConfirm()
+                            vm.isOpenConfirmDialog = false
+                        },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("Confirm")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ConfirmViewPreview() {
+    MemTopicTheme {
+        val vm = EditTopicViewModel()
+        vm.isOpenConfirmDialog = true
+        ConfirmView(
+            content = "Do you really want to do so?",
+            vm = vm,
+            onConfirm = {}
         )
     }
 }

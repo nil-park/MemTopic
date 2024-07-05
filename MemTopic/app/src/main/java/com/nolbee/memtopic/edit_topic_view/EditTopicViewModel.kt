@@ -5,10 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.nolbee.memtopic.database.Topic
-import com.nolbee.memtopic.dialog_view.IAlertAndConfirmViewModel
 import java.util.Date
 
-class EditTopicViewModel : ViewModel(), IAlertAndConfirmViewModel {
+class EditTopicViewModel : ViewModel() {
     var topicRef: Topic by mutableStateOf(
         Topic(title = "", content = "", lastModified = Date(), lastPlayback = Date())
     )
@@ -41,5 +40,5 @@ class EditTopicViewModel : ViewModel(), IAlertAndConfirmViewModel {
         isNew = topic.id == 0
     }
 
-    override var openAlertAndConfirmDialog by mutableStateOf(false)
+    var isOpenConfirmDialog by mutableStateOf(false)
 }
