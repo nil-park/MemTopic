@@ -83,7 +83,7 @@ fun EditTopicViewTopAppBar(
                     )
                 },
                 actions = {
-                    if (editTopicViewModel.isModified) {
+                    if (editTopicViewModel.isSavable) {
                         IconButton(
                             onClick = {
                                 editTopicViewModel.isOpenConfirmDialog = true
