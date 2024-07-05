@@ -49,29 +49,6 @@ fun EditTopicViewTopAppBar(
     topicViewModel: ITopicViewModel,
     editTopicViewModel: EditTopicViewModel,
 ) {
-    val confirmMessage = if (editTopicViewModel.isNew) {
-        stringResource(R.string.add_new_topic_confirm, editTopicViewModel.topicTitle)
-    } else {
-        stringResource(R.string.edit_topic_confirm, editTopicViewModel.topicTitle)
-    }
-
-    ConfirmView(
-        content = confirmMessage,
-        vm = editTopicViewModel,
-        onConfirm = {
-            topicViewModel.upsertTopic(
-                Topic(
-                    id = editTopicViewModel.topicRef.id,
-                    title = editTopicViewModel.topicTitle,
-                    content = editTopicViewModel.topicContent,
-                    lastModified = Date(),
-                    lastPlayback = editTopicViewModel.topicRef.lastPlayback,
-                )
-            )
-            navController.navigateUp()
-        }
-    )
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -106,6 +83,29 @@ fun EditTopicViewTopAppBar(
                 TopicTitleTextField(editTopicViewModel)
                 TopicContentTextField(editTopicViewModel)
             }
+        }
+    )
+
+    val confirmMessage = if (editTopicViewModel.isNew) {
+        stringResource(R.string.add_new_topic_confirm, editTopicViewModel.topicTitle)
+    } else {
+        stringResource(R.string.edit_topic_confirm, editTopicViewModel.topicTitle)
+    }
+
+    ConfirmView(
+        content = confirmMessage,
+        vm = editTopicViewModel,
+        onConfirm = {
+            topicViewModel.upsertTopic(
+                Topic(
+                    id = editTopicViewModel.topicRef.id,
+                    title = editTopicViewModel.topicTitle,
+                    content = editTopicViewModel.topicContent,
+                    lastModified = Date(),
+                    lastPlayback = editTopicViewModel.topicRef.lastPlayback,
+                )
+            )
+            navController.navigateUp()
         }
     )
 }
