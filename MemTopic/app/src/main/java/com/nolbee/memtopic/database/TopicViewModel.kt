@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -47,7 +46,9 @@ interface ITopicViewModel {
     val topics: Flow<List<Topic>>
     var topicToEdit: Topic
     fun upsertTopic(topic: Topic)
-    fun deleteTopic(topic: Topic)
+    fun deleteTopic()
+    var isOpenDeleteConfirmDialog: Boolean
+    var topicToDelete: Topic
 }
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -61,9 +62,7 @@ class TopicViewModel @Inject constructor(
         repository.getTopicList(sort)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    override var topicToEdit: Topic by mutableStateOf(
-        Topic(title = "", content = "", lastModified = Date(), lastPlayback = Date())
-    )
+    override var topicToEdit: Topic by mutableStateOf(Topic())
 
     override fun upsertTopic(topic: Topic) {
         viewModelScope.launch {
@@ -71,11 +70,14 @@ class TopicViewModel @Inject constructor(
         }
     }
 
-    override fun deleteTopic(topic: Topic) {
+    override fun deleteTopic() {
         viewModelScope.launch {
-            repository.deleteTopic(topic)
+            repository.deleteTopic(topicToDelete)
         }
     }
+
+    override var isOpenDeleteConfirmDialog: Boolean by mutableStateOf(false)
+    override var topicToDelete: Topic by mutableStateOf(Topic())
 }
 
 class MockTopicViewModel : ViewModel(), ITopicViewModel {
@@ -83,10 +85,10 @@ class MockTopicViewModel : ViewModel(), ITopicViewModel {
         listOf(sampleTopic00, sampleTopic01)
     )
     override val topics: Flow<List<Topic>> = _topics.asStateFlow()
-    override var topicToEdit = Topic(
-        title = "", content = "", lastModified = Date(), lastPlayback = Date()
-    )
+    override var topicToEdit = Topic()
 
     override fun upsertTopic(topic: Topic) {}
-    override fun deleteTopic(topic: Topic) {}
+    override fun deleteTopic() {}
+    override var isOpenDeleteConfirmDialog: Boolean = false
+    override var topicToDelete = Topic()
 }

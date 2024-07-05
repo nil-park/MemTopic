@@ -2,6 +2,7 @@
     <string name="app_name">MemTopic</string>
     <string name="add_new_topic_confirm">Do you really want to add a new topic "%1$s"?</string>
     <string name="edit_topic_confirm">Do you really want to edit topic "%1$s"?</string>
+    <string name="delete_topic_confirm">Do you really want to delete topic "%1$s"?</string>
     <string name="new_topic">새 토픽</string>
     <string name="edit_topic">토픽 편집</string>
 </resources>
