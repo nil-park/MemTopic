@@ -140,7 +140,7 @@ private fun TopicContentTextField(editTopicViewModel: EditTopicViewModel) {
 
 @Preview(showBackground = true)
 @Composable
-fun EditTopicPreview() {
+private fun EditTopicPreview() {
     MemTopicTheme {
         EditTopicViewTopAppBar(
             navController = rememberNavController(),
@@ -192,7 +192,7 @@ private fun ConfirmView(
 
 @Preview(showBackground = true)
 @Composable
-fun ConfirmViewPreview() {
+private fun ConfirmViewPreview() {
     MemTopicTheme {
         val vm = EditTopicViewModel()
         vm.isOpenConfirmDialog = true
