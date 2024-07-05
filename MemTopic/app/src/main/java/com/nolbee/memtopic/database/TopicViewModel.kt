@@ -47,7 +47,7 @@ interface ITopicViewModel {
     var topicToEdit: Topic
     fun upsertTopic(topic: Topic)
     fun deleteTopic()
-    var isOpenDeleteConfirmDialog: Boolean
+    var isDeleteConfirmDialogOpen: Boolean
     var topicToDelete: Topic
 }
 
@@ -76,7 +76,7 @@ class TopicViewModel @Inject constructor(
         }
     }
 
-    override var isOpenDeleteConfirmDialog: Boolean by mutableStateOf(false)
+    override var isDeleteConfirmDialogOpen: Boolean by mutableStateOf(false)
     override var topicToDelete: Topic by mutableStateOf(Topic())
 }
 
@@ -89,6 +89,6 @@ class MockTopicViewModel : ViewModel(), ITopicViewModel {
 
     override fun upsertTopic(topic: Topic) {}
     override fun deleteTopic() {}
-    override var isOpenDeleteConfirmDialog: Boolean = false
+    override var isDeleteConfirmDialogOpen: Boolean = false
     override var topicToDelete = Topic()
 }

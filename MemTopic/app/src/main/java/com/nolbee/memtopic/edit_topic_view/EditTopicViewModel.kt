@@ -42,5 +42,5 @@ class EditTopicViewModel : ViewModel() {
         isNew = topic.id == 0
     }
 
-    var isOpenConfirmDialog by mutableStateOf(false)
+    var isConfirmDialogOpen by mutableStateOf(false)
 }

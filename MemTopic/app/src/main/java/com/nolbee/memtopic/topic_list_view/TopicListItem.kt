@@ -66,7 +66,7 @@ fun TopicListItem(
                     }
                     IconButton(onClick = {
                         topicViewModel.topicToDelete = topic
-                        topicViewModel.isOpenDeleteConfirmDialog = true
+                        topicViewModel.isDeleteConfirmDialogOpen = true
                     }) {
                         Icon(Icons.Filled.Delete, contentDescription = null)
                     }

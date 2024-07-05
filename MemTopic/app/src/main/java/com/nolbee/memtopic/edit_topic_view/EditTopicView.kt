@@ -86,7 +86,7 @@ fun EditTopicViewTopAppBar(
                     if (editTopicViewModel.isSavable) {
                         IconButton(
                             onClick = {
-                                editTopicViewModel.isOpenConfirmDialog = true
+                                editTopicViewModel.isConfirmDialogOpen = true
                             },
                         ) {
                             Icon(
@@ -157,10 +157,10 @@ private fun ConfirmView(
     vm: EditTopicViewModel,
     onConfirm: () -> Unit,
 ) {
-    if (vm.isOpenConfirmDialog) {
+    if (vm.isConfirmDialogOpen) {
         BasicAlertDialog(
             onDismissRequest = {
-                vm.isOpenConfirmDialog = false
+                vm.isConfirmDialogOpen = false
             }
         ) {
             Surface(
@@ -178,7 +178,7 @@ private fun ConfirmView(
                     TextButton(
                         onClick = {
                             onConfirm()
-                            vm.isOpenConfirmDialog = false
+                            vm.isConfirmDialogOpen = false
                         },
                         modifier = Modifier.align(Alignment.End)
                     ) {
@@ -195,7 +195,7 @@ private fun ConfirmView(
 private fun ConfirmViewPreview() {
     MemTopicTheme {
         val vm = EditTopicViewModel()
-        vm.isOpenConfirmDialog = true
+        vm.isConfirmDialogOpen = true
         ConfirmView(
             content = "Do you really want to do so?",
             vm = vm,

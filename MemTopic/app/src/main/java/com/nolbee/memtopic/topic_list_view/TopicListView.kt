@@ -140,11 +140,11 @@ private fun DeleteConfirmView(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    if (vm.isOpenDeleteConfirmDialog) {
+    if (vm.isDeleteConfirmDialogOpen) {
         BasicAlertDialog(
             onDismissRequest = {
                 onDismiss()
-                vm.isOpenDeleteConfirmDialog = false
+                vm.isDeleteConfirmDialogOpen = false
             }
         ) {
             Surface(
@@ -171,7 +171,7 @@ private fun DeleteConfirmView(
                     TextButton(
                         onClick = {
                             onConfirm()
-                            vm.isOpenDeleteConfirmDialog = false
+                            vm.isDeleteConfirmDialogOpen = false
                         },
                         modifier = Modifier.align(Alignment.End),
                     ) {
@@ -188,7 +188,7 @@ private fun DeleteConfirmView(
 private fun DeleteConfirmViewPreview() {
     MemTopicTheme {
         val vm = MockTopicViewModel()
-        vm.isOpenDeleteConfirmDialog = true
+        vm.isDeleteConfirmDialogOpen = true
         DeleteConfirmView(
             content = "Do you really want to do so?",
             vm = vm,
