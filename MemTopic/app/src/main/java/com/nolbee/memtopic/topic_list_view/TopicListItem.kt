@@ -45,6 +45,7 @@ fun TopicListItem(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
     Column {
         ListItem(
             headlineContent = { Text(topic.title) },
@@ -64,7 +65,8 @@ fun TopicListItem(
                         Icon(Icons.Filled.Edit, contentDescription = null)
                     }
                     IconButton(onClick = {
-                        topicViewModel.deleteTopic(topic) // TODO: 좀 물어 보고 지워라
+                        topicViewModel.topicToDelete = topic
+                        topicViewModel.isDeleteConfirmDialogOpen = true
                     }) {
                         Icon(Icons.Filled.Delete, contentDescription = null)
                     }

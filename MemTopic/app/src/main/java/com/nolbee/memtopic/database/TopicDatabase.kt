@@ -19,10 +19,10 @@ import java.util.Locale
 data class Topic(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val title: String,
-    val lastModified: Date,
-    val lastPlayback: Date,
-    val content: String
+    val title: String = "",
+    val lastModified: Date = Date(),
+    val lastPlayback: Date = Date(),
+    val content: String = "",
 )
 
 @Dao

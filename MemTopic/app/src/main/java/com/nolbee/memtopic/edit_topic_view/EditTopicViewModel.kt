@@ -17,7 +17,7 @@ class EditTopicViewModel : ViewModel() {
     var topicContent by mutableStateOf(topicRef.content)
         private set
 
-    var isModified by mutableStateOf(false)
+    var isSavable by mutableStateOf(false)
         private set
 
     var isNew by mutableStateOf(false)
@@ -25,12 +25,14 @@ class EditTopicViewModel : ViewModel() {
 
     fun updateTitle(newTitle: String) {
         topicTitle = newTitle
-        isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content)
+        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content)
+        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != ""
     }
 
     fun updateContent(newContent: String) {
         topicContent = newContent
-        isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content)
+        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content)
+        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != ""
     }
 
     fun setTopicReference(topic: Topic) {
@@ -39,4 +41,6 @@ class EditTopicViewModel : ViewModel() {
         topicRef = topic
         isNew = topic.id == 0
     }
+
+    var isConfirmDialogOpen by mutableStateOf(false)
 }
