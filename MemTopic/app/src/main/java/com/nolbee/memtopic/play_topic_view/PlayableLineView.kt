@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.nolbee.memtopic.database.sampleTopic00
+import com.nolbee.memtopic.database.sampleTopic02
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
 
@@ -44,7 +44,7 @@ fun PlayableLineList(
 @Composable
 fun PlayableLineListPreview() {
     val vm = PlayTopicViewModel()
-    vm.setTopic(sampleTopic00)
+    vm.setTopic(sampleTopic02)
     MemTopicTheme {
         PlayableLineList(
             vm = vm
