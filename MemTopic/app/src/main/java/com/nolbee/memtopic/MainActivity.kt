@@ -21,6 +21,8 @@ import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.TopicViewModel
 import com.nolbee.memtopic.edit_topic_view.EditTopicViewModel
 import com.nolbee.memtopic.edit_topic_view.EditTopicViewTopAppBar
+import com.nolbee.memtopic.play_topic_view.PlayTopicViewModel
+import com.nolbee.memtopic.play_topic_view.PlayTopicViewTopAppBar
 import com.nolbee.memtopic.topic_list_view.TopicListTopAppBar
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,6 +81,19 @@ fun MainView(
                         navController = navController,
                         topicViewModel = topicViewModel,
                         editTopicViewModel = editTopicViewModel,
+                    )
+                }
+                composable(
+                    "PlayTopicView",
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None }
+                ) {
+                    val playTopicViewModel: PlayTopicViewModel = viewModel()
+                    LaunchedEffect(Unit) {
+                        playTopicViewModel.setTopic(topicViewModel.topicToPlay)
+                    }
+                    PlayTopicViewTopAppBar(
+                        vm = playTopicViewModel,
                     )
                 }
             }
