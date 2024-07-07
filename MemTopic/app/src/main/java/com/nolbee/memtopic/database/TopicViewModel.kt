@@ -45,6 +45,7 @@ object TopicDatabaseModule {
 interface ITopicViewModel {
     val topics: Flow<List<Topic>>
     var topicToEdit: Topic
+    var topicToPlay: Topic
     fun upsertTopic(topic: Topic)
     fun deleteTopic()
     var isDeleteConfirmDialogOpen: Boolean
@@ -63,6 +64,7 @@ class TopicViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     override var topicToEdit: Topic by mutableStateOf(Topic())
+    override var topicToPlay: Topic by mutableStateOf(Topic())
 
     override fun upsertTopic(topic: Topic) {
         viewModelScope.launch {
@@ -86,6 +88,7 @@ class MockTopicViewModel : ViewModel(), ITopicViewModel {
     )
     override val topics: Flow<List<Topic>> = _topics.asStateFlow()
     override var topicToEdit = Topic()
+    override var topicToPlay = Topic()
 
     override fun upsertTopic(topic: Topic) {}
     override fun deleteTopic() {}

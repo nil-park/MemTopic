@@ -5,4 +5,5 @@
     <string name="delete_topic_confirm">Do you really want to delete topic "%1$s"?</string>
     <string name="new_topic">새 토픽</string>
     <string name="edit_topic">토픽 편집</string>
+    <string name="play_topic_title">Play Topic: "%1$s"</string>
 </resources>

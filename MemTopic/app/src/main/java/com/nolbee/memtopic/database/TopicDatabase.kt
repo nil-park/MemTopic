@@ -94,3 +94,26 @@ val sampleTopic01 = Topic(
         Finally, we simulate die rolls by randomly throwing darts at the target, which we can achieve by using a combination of a fair die and a biased coin flip.
     """.trimIndent()
 )
+
+val sampleTopic02 = Topic(
+    id = 3,
+    title = "Cloud Computing",
+    lastModified = dateFormat.parse("2024-07-07") ?: Date(),
+    lastPlayback = dateFormat.parse("2024-07-15") ?: Date(),
+    content = """
+        Cloud computing is the on-demand availability of computing resources as services over the internet.
+        It eliminates the need for individuals and businesses to self-manage physical resources themselves,
+        and only pay for what they use.
+        Public clouds are run by third-party cloud service providers.
+        They offer compute, storage, and network resources over the internet,
+        enabling companies to access shared on-demand resources
+        based on their unique requirements and business goals.
+        Private clouds are built, managed, and owned by a single organization
+        and privately hosted in their own data centers, commonly known as “on-premises” or “on-prem.”
+        They provide greater control, security, and management of data
+        while still enabling internal users to benefit from a shared pool of compute, storage, and network resources.
+        Hybrid clouds combine public and private cloud models,
+        allowing companies to leverage public cloud services
+        and maintain the security and compliance capabilities commonly found in private cloud architectures.
+    """.trimIndent()
+)

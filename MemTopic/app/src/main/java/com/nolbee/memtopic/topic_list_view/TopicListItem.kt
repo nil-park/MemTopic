@@ -7,6 +7,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,10 +50,22 @@ fun TopicListItem(
 
     Column {
         ListItem(
-            headlineContent = { Text(topic.title) },
+            headlineContent = {
+                Text(
+                    topic.title,
+                    modifier = Modifier.clickable {
+                        topicViewModel.topicToPlay = topic
+                        navController.navigate("PlayTopicView")
+                    }
+                )
+            },
             supportingContent = {
                 Text(
                     topic.content,
+                    modifier = Modifier.clickable {
+                        topicViewModel.topicToPlay = topic
+                        navController.navigate("PlayTopicView")
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
