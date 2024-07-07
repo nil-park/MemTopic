@@ -3,6 +3,7 @@ package com.nolbee.memtopic.play_topic_view
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -74,12 +75,17 @@ fun PlayableLineItem(
                 if (isPlaying) {
                     Text(
                         text = "Playing...",
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.End)
                     )
                 }
             },
             leadingContent = {
-                Icon(imageVector = Icons.Filled.ArrowCircleDown, contentDescription = null)
+                Icon(
+                    imageVector = Icons.Filled.ArrowCircleDown,
+                    contentDescription = "Select line"
+                )
             }
         )
         HorizontalDivider()
