@@ -3,7 +3,7 @@ package com.nolbee.memtopic.topic_list_view
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
@@ -105,7 +105,11 @@ fun TopicListItem(
                                     action = "ACTION_PLAY"
                                     putExtra(AudioPlayerService.KEY_BASE64_AUDIO, audioBase64)
                                 }
-                                context.startService(intent)
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    context.startForegroundService(intent)
+                                } else {
+                                    context.startService(intent)
+                                }
                                 val fileData = Base64.decode(audioBase64, Base64.DEFAULT)
                                 saveFileWithMediaStore(context, topic.title, fileData)
                             }
