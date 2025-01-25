@@ -87,6 +87,9 @@ dependencies {
     // other dependencies
     implementation("com.google.code.gson:gson:2.11.0")
 
+    // media style notification dependencies
+    implementation("androidx.media:media:1.7.0")
+
     // hilt
     val hiltVersion = "2.51.1"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
