@@ -10,18 +10,38 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
+import com.nolbee.memtopic.account_view.SecureKeyValueStore
+import com.nolbee.memtopic.client.TextToSpeechGCP
+import com.nolbee.memtopic.database.Playback
+import com.nolbee.memtopic.database.PlaybackDao
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+// TODO: Notification 권한 요청
+
+@AndroidEntryPoint
 class AudioPlayerService : Service() {
     companion object {
+        const val ACTION_UPDATE = "ACTION_UPDATE"
         const val ACTION_PLAY = "ACTION_PLAY"
         const val ACTION_EXIT = "ACTION_EXIT"
-        const val KEY_BASE64_AUDIO = "KEY_BASE64_AUDIO"
+        const val KEY_TOPIC_ID = "KEY_TOPIC_ID"
+        const val KEY_CONTENT = "KEY_CONTENT"
         private const val CHANNEL_ID = "MediaPlaybackChannel"
         private const val NOTIFICATION_ID = 100
     }
 
+    @Inject
+    lateinit var playbackDao: PlaybackDao
+
     private var mediaPlayer: MediaPlayer? = null
-    private var base64Data: String = ""
+    private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun onCreate() {
         super.onCreate()
@@ -31,9 +51,56 @@ class AudioPlayerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
+            ACTION_UPDATE -> {
+                val topicId = intent.getIntExtra(KEY_TOPIC_ID, -1)
+                val content = intent.getStringExtra(KEY_CONTENT).orEmpty()
+                serviceScope.launch {
+                    playbackDao.upsertPlayback(
+                        Playback(
+                            topicId = topicId,
+                            sentenceIndex = 0,
+                            currentRepetition = 0,
+                            totalRepetitions = 2,
+                            isInterval = false,
+                            content = content,
+                        )
+                    )
+                    try {
+                        val keyValueStore = SecureKeyValueStore(applicationContext)
+                        val client = TextToSpeechGCP(
+                            keyValueStore.get("gcpTextToSpeechToken") ?: "",
+                            "en-US",
+                            "en-US-Neural2-J"
+                        )
+                        val audioBase64 = client.synthesize(content)
+                        withContext(Dispatchers.Main) {
+                            play(audioBase64)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+
             ACTION_PLAY -> {
-                base64Data = intent.getStringExtra(KEY_BASE64_AUDIO) ?: return START_NOT_STICKY
-                play()
+                serviceScope.launch {
+                    try {
+                        val playback = playbackDao.getPlaybackOnce()
+                        val content = playback?.content ?: ""
+                        val keyValueStore = SecureKeyValueStore(applicationContext)
+                        val client = TextToSpeechGCP(
+                            keyValueStore.get("gcpTextToSpeechToken") ?: "",
+                            "en-US",
+                            "en-US-Neural2-J"
+                        )
+                        val audioBase64 = client.synthesize(content)
+                        withContext(Dispatchers.Main) {
+                            play(audioBase64)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
             }
 
             ACTION_EXIT -> {
@@ -47,26 +114,25 @@ class AudioPlayerService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun play() {
+    private fun play(audioBase64: String) {
         if (mediaPlayer?.isPlaying == true) return
 
         mediaPlayer?.apply {
             reset()
-            setDataSource("data:audio/mp3;base64,$base64Data")
+            setDataSource("data:audio/mp3;base64,$audioBase64")
             prepare()
             start()
         }
     }
 
     private fun stopMedia() {
-        if (mediaPlayer?.isPlaying == true) {
-            mediaPlayer?.stop()
-        }
+        mediaPlayer?.takeIf { it.isPlaying }?.stop()
     }
 
     override fun onDestroy() {
         mediaPlayer?.release()
         mediaPlayer = null
+        serviceScope.cancel()
         super.onDestroy()
     }
 

@@ -30,5 +30,8 @@ interface PlaybackDao {
     suspend fun upsertPlayback(state: Playback)
 
     @Query("SELECT * FROM playback LIMIT 1")
+    suspend fun getPlaybackOnce(): Playback?
+
+    @Query("SELECT * FROM playback LIMIT 1")
     fun getPlayback(): Flow<Playback?>
 }

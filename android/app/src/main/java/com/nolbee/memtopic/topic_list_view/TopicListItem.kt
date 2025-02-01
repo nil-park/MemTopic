@@ -91,6 +91,16 @@ fun TopicListItem(
             leadingContent = {
                 IconButton(onClick = {
                     // TODO: Composable 상태를 disable로 만들기
+                    val intent = Intent(context, AudioPlayerService::class.java).apply {
+                        action = AudioPlayerService.ACTION_UPDATE
+                        putExtra(AudioPlayerService.KEY_TOPIC_ID, topic.id)
+                        putExtra(AudioPlayerService.KEY_CONTENT, topic.content)
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    } else {
+                        context.startService(intent)
+                    }
                     coroutineScope.launch {
                         try {
                             val keyValueStore = SecureKeyValueStore(context)
@@ -101,15 +111,6 @@ fun TopicListItem(
                             )
                             val audioBase64 = client.synthesize(topic.content)
                             withContext(Dispatchers.Main) {
-                                val intent = Intent(context, AudioPlayerService::class.java).apply {
-                                    action = "ACTION_PLAY"
-                                    putExtra(AudioPlayerService.KEY_BASE64_AUDIO, audioBase64)
-                                }
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    context.startForegroundService(intent)
-                                } else {
-                                    context.startService(intent)
-                                }
                                 val fileData = Base64.decode(audioBase64, Base64.DEFAULT)
                                 saveFileWithMediaStore(context, topic.title, fileData)
                             }
