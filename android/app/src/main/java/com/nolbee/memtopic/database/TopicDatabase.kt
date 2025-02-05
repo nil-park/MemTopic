@@ -28,9 +28,10 @@ class Converters {
 @Database(
     entities = [
         Topic::class,
-        Playback::class
+        Playback::class,
+        AudioCache::class,
     ],
-    version = 2
+    version = 3
 )
 @TypeConverters(
     Converters::class
@@ -38,6 +39,7 @@ class Converters {
 abstract class TopicDatabase : RoomDatabase() {
     abstract fun topicDao(): TopicDao
     abstract fun playbackDao(): PlaybackDao
+    abstract fun audioCacheDao(): AudioCacheDao
 }
 
 @Module
@@ -57,6 +59,11 @@ object TopicDatabaseModule {
     @Provides
     fun providePlaybackDao(db: TopicDatabase): PlaybackDao {
         return db.playbackDao()
+    }
+
+    @Provides
+    fun provideAudioCacheDao(db: TopicDatabase): AudioCacheDao {
+        return db.audioCacheDao()
     }
 
     @Provides
