@@ -1,5 +1,7 @@
 package com.nolbee.memtopic.play_topic_view
 
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,9 +19,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.nolbee.memtopic.database.sampleTopic02
+import com.nolbee.memtopic.player.AudioPlayerService
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
 
@@ -58,13 +62,26 @@ fun PlayableLineItem(
     text: String,
     vm: PlayTopicViewModel,
 ) {
+    val context = LocalContext.current
     val currentIndex by vm.currentLineIndex.collectAsState()
     val isPlaying = currentIndex == index
     Column {
         ListItem(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { vm.setCurrentLine(index) },
+                .clickable {
+                    vm.setCurrentLine(index)
+                    val intent = Intent(context, AudioPlayerService::class.java).apply {
+                        action = AudioPlayerService.ACTION_UPDATE
+                        putExtra(AudioPlayerService.KEY_TOPIC_ID, vm.topicToPlay.id)
+                        putExtra(AudioPlayerService.KEY_SENTENCE_ID, index)
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    } else {
+                        context.startService(intent)
+                    }
+                },
             headlineContent = {
                 Text(
                     text = text,

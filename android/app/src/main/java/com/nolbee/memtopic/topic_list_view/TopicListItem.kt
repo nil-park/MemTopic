@@ -91,16 +91,6 @@ fun TopicListItem(
             leadingContent = {
                 IconButton(onClick = {
                     // TODO: Composable 상태를 disable로 만들기
-                    val intent = Intent(context, AudioPlayerService::class.java).apply {
-                        action = AudioPlayerService.ACTION_UPDATE
-                        putExtra(AudioPlayerService.KEY_TOPIC_ID, topic.id)
-                        putExtra(AudioPlayerService.KEY_CONTENT, topic.content)
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(intent)
-                    } else {
-                        context.startService(intent)
-                    }
                     coroutineScope.launch {
                         try {
                             val keyValueStore = SecureKeyValueStore(context)

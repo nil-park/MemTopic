@@ -30,6 +30,9 @@ interface TopicDao {
     @Delete
     suspend fun deleteTopic(topic: Topic)
 
+    @Query("SELECT * FROM topic WHERE id = :id")
+    suspend fun getTopic(id: Int): Topic?
+
     @Query("SELECT * FROM topic ORDER BY title ASC")
     fun selectTopicByName(): Flow<List<Topic>>
 

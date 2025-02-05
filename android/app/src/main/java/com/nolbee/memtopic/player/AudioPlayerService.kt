@@ -8,12 +8,17 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.nolbee.memtopic.account_view.SecureKeyValueStore
 import com.nolbee.memtopic.client.TextToSpeechGCP
+import com.nolbee.memtopic.database.AudioCache
+import com.nolbee.memtopic.database.AudioCacheDao
 import com.nolbee.memtopic.database.Playback
 import com.nolbee.memtopic.database.PlaybackDao
+import com.nolbee.memtopic.database.TopicDao
+import com.nolbee.memtopic.utils.ContentParser
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,13 +37,19 @@ class AudioPlayerService : Service() {
         const val ACTION_PLAY = "ACTION_PLAY"
         const val ACTION_EXIT = "ACTION_EXIT"
         const val KEY_TOPIC_ID = "KEY_TOPIC_ID"
-        const val KEY_CONTENT = "KEY_CONTENT"
+        const val KEY_SENTENCE_ID = "KEY_SENTENCE_ID"
         private const val CHANNEL_ID = "MediaPlaybackChannel"
         private const val NOTIFICATION_ID = 100
     }
 
     @Inject
     lateinit var playbackDao: PlaybackDao
+
+    @Inject
+    lateinit var topicDao: TopicDao
+
+    @Inject
+    lateinit var audioCacheDao: AudioCacheDao
 
     private var mediaPlayer: MediaPlayer? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
@@ -53,31 +64,20 @@ class AudioPlayerService : Service() {
         when (intent?.action) {
             ACTION_UPDATE -> {
                 val topicId = intent.getIntExtra(KEY_TOPIC_ID, -1)
-                val content = intent.getStringExtra(KEY_CONTENT).orEmpty()
+                val sentenceIndex = intent.getIntExtra(KEY_SENTENCE_ID, -1)
+                Log.d("AudioPlayerService", "topicId: $topicId, sentenceIndex: $sentenceIndex")
                 serviceScope.launch {
-                    playbackDao.upsertPlayback(
-                        Playback(
+                    topicDao.getTopic(topicId)?.let { topic ->
+                        val playback = Playback(
                             topicId = topicId,
-                            sentenceIndex = 0,
+                            sentenceIndex = sentenceIndex,
                             currentRepetition = 0,
                             totalRepetitions = 2,
                             isInterval = false,
-                            content = content,
+                            content = topic.content,
                         )
-                    )
-                    try {
-                        val keyValueStore = SecureKeyValueStore(applicationContext)
-                        val client = TextToSpeechGCP(
-                            keyValueStore.get("gcpTextToSpeechToken") ?: "",
-                            "en-US",
-                            "en-US-Neural2-J"
-                        )
-                        val audioBase64 = client.synthesize(content)
-                        withContext(Dispatchers.Main) {
-                            play(audioBase64)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                        playbackDao.upsertPlayback(playback)
+                        play(playback)
                     }
                 }
             }
@@ -85,18 +85,7 @@ class AudioPlayerService : Service() {
             ACTION_PLAY -> {
                 serviceScope.launch {
                     try {
-                        val playback = playbackDao.getPlaybackOnce()
-                        val content = playback?.content ?: ""
-                        val keyValueStore = SecureKeyValueStore(applicationContext)
-                        val client = TextToSpeechGCP(
-                            keyValueStore.get("gcpTextToSpeechToken") ?: "",
-                            "en-US",
-                            "en-US-Neural2-J"
-                        )
-                        val audioBase64 = client.synthesize(content)
-                        withContext(Dispatchers.Main) {
-                            play(audioBase64)
-                        }
+                        playbackDao.getPlaybackOnce()?.let { playback -> play(playback) }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -112,6 +101,32 @@ class AudioPlayerService : Service() {
         }
         startForeground(NOTIFICATION_ID, buildNotification())
         return START_NOT_STICKY
+    }
+
+    private suspend fun play(playback: Playback) {
+        val ttsEngine = "gcp" // TODO: get from Topic
+        val languageCode = "en-US" // TODO: get from Topic
+        val voiceType = "en-US-Neural2-J" // TODO: get from Topic
+        // TODO: out of index handling
+        val sentence =
+            ContentParser.parseContentToSentences(playback.content)[playback.sentenceIndex]
+
+        val cacheKey = "${ttsEngine}_${languageCode}_${voiceType}_${sentence.hashCode()}"
+        val cached = audioCacheDao.getCachedAudio(cacheKey)
+        if (cached != null) {
+            Log.d("AudioPlayerService", "cache hit")
+            withContext(Dispatchers.Main) {
+                play(cached)
+            }
+        } else {
+            Log.d("AudioPlayerService", "cache miss")
+            val apiKey = SecureKeyValueStore(applicationContext).get("gcpTextToSpeechToken") ?: ""
+            val audioBase64 = TextToSpeechGCP(apiKey, languageCode, voiceType).synthesize(sentence)
+            audioCacheDao.upsertCache(AudioCache(cacheKey, audioBase64))
+            withContext(Dispatchers.Main) {
+                play(audioBase64)
+            }
+        }
     }
 
     private fun play(audioBase64: String) {
