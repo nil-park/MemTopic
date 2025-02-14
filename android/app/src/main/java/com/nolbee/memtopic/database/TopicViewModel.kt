@@ -1,17 +1,11 @@
 package com.nolbee.memtopic.database
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Room
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,27 +14,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
-
-@Module
-@InstallIn(SingletonComponent::class)
-object TopicDatabaseModule {
-    @Provides
-    @Singleton
-    fun provideDatabase(app: Application): TopicDatabase {
-        return Room.databaseBuilder(app, TopicDatabase::class.java, "topicDatabase").build()
-    }
-
-    @Provides
-    fun provideTopicDao(db: TopicDatabase): TopicDao {
-        return db.topicDao()
-    }
-
-    @Provides
-    fun provideTopicRepository(topicDao: TopicDao): TopicRepository {
-        return TopicRepository(topicDao)
-    }
-}
 
 interface ITopicViewModel {
     val topics: Flow<List<Topic>>

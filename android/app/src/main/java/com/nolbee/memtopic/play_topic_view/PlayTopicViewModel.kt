@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.nolbee.memtopic.database.Topic
+import com.nolbee.memtopic.utils.ContentParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -20,7 +21,8 @@ class PlayTopicViewModel : ViewModel() {
 
     fun setTopic(topic: Topic) {
         this.topicToPlay = topic
-        parseContentToLines(topic.content)
+        val sentences = ContentParser.parseContentToSentences(topic.content)
+        playableLines.update { sentences }
         setCurrentLine(0)
     }
 
@@ -28,29 +30,5 @@ class PlayTopicViewModel : ViewModel() {
         if (index in playableLines.value.indices) {
             currentLineIndex.value = index
         }
-    }
-
-    private fun parseContentToLines(content: String) {
-        val sentences = mutableListOf<String>()
-        var i0 = 0
-        content.forEachIndexed { i, c ->
-            when (c) {
-                '.', '?', '!' -> {
-                    if (
-                        i + 1 < content.length && content[i + 1].isWhitespace()
-                        || i + 1 == content.length
-                    ) {
-                        sentences.add(content.substring(i0, i + 1))
-                        i0 = i + 1
-                    }
-                }
-
-                '\n', '\r' -> {
-                    sentences.add(content.substring(i0, i + 1))
-                    i0 = i + 1
-                }
-            }
-        }
-        playableLines.update { sentences.filterNot { it.isBlank() }.map { it.trim() } }
     }
 }

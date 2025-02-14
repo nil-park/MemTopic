@@ -2,7 +2,8 @@ package com.nolbee.memtopic.topic_list_view
 
 import android.content.ContentValues
 import android.content.Context
-import android.media.MediaPlayer
+import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
@@ -33,6 +34,7 @@ import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.database.sampleTopic00
+import com.nolbee.memtopic.player.AudioPlayerService
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -99,7 +101,6 @@ fun TopicListItem(
                             )
                             val audioBase64 = client.synthesize(topic.content)
                             withContext(Dispatchers.Main) {
-                                // play(audioBase64)
                                 val fileData = Base64.decode(audioBase64, Base64.DEFAULT)
                                 saveFileWithMediaStore(context, topic.title, fileData)
                             }
@@ -127,18 +128,6 @@ fun TopicListItemPreview() {
             navController = rememberNavController(),
             topicViewModel = MockTopicViewModel(),
         )
-    }
-}
-
-private fun play(audioBase64: String) {
-    val player = MediaPlayer()
-    try {
-        player.reset()
-        player.setDataSource("data:audio/mp3;base64,$audioBase64")
-        player.prepare()
-        player.start()
-    } catch (e: Exception) {
-        Log.d("GCPTest", "Error from play(): ${e.message}")
     }
 }
 
