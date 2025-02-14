@@ -89,7 +89,7 @@ class TextToSpeechGCP(
             try {
                 HttpClient(CIO) {
                     install(HttpTimeout) {
-                        requestTimeoutMillis = 5000 // TODO: request timeout from configuration
+                        requestTimeoutMillis = 15000 // TODO: request timeout from configuration
                     }
                 }.use { client ->
                     response = client.post(url) {
