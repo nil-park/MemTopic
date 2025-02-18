@@ -22,6 +22,7 @@ data class Playback(
     val totalRepetitions: Int,       // How many times the current sentence should be repeated
     val isInterval: Boolean = false, // Whether the current section is the interval
     val content: String = "",
+    // TODO: is playing
 )
 
 @Dao

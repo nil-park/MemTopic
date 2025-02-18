@@ -29,7 +29,7 @@ import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
 @Composable
 fun PlayableLineList(
-    vm: PlayTopicViewModel
+    vm: IPlayTopicViewModel
 ) {
     val lines by vm.playableLines.collectAsState(initial = emptyList())
 
@@ -47,7 +47,7 @@ fun PlayableLineList(
 @Preview
 @Composable
 fun PlayableLineListPreview() {
-    val vm = PlayTopicViewModel()
+    val vm = MockPlayTopicViewModel()
     vm.setTopic(sampleTopic02)
     MemTopicTheme {
         PlayableLineList(
@@ -60,7 +60,7 @@ fun PlayableLineListPreview() {
 fun PlayableLineItem(
     index: Int,
     text: String,
-    vm: PlayTopicViewModel,
+    vm: IPlayTopicViewModel,
 ) {
     val context = LocalContext.current
     val currentIndex by vm.currentLineIndex.collectAsState()
