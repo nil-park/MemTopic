@@ -21,6 +21,7 @@ import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.TopicViewModel
 import com.nolbee.memtopic.edit_topic_view.EditTopicViewModel
 import com.nolbee.memtopic.edit_topic_view.EditTopicViewTopAppBar
+import com.nolbee.memtopic.play_topic_view.IPlayTopicViewModel
 import com.nolbee.memtopic.play_topic_view.PlayTopicViewModel
 import com.nolbee.memtopic.play_topic_view.PlayTopicViewTopAppBar
 import com.nolbee.memtopic.topic_list_view.TopicListTopAppBar
@@ -88,7 +89,8 @@ fun MainView(
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None }
                 ) {
-                    val playTopicViewModel: PlayTopicViewModel = viewModel()
+                    val playTopicViewModel: IPlayTopicViewModel =
+                        hiltViewModel<PlayTopicViewModel>()
                     LaunchedEffect(Unit) {
                         playTopicViewModel.setTopic(topicViewModel.topicToPlay)
                     }
@@ -100,8 +102,6 @@ fun MainView(
         }
     )
 }
-
-private const val TAG = "MainActivity"
 
 @Preview(showBackground = true)
 @Composable

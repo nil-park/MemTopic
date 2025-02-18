@@ -21,7 +21,7 @@ import com.nolbee.memtopic.ui.theme.MemTopicTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayTopicViewTopAppBar(
-    vm: PlayTopicViewModel,
+    vm: IPlayTopicViewModel,
 ) {
     val playTopicTitle = stringResource(R.string.play_topic_title, vm.topicToPlay.title)
     Scaffold(
@@ -53,7 +53,7 @@ fun PlayTopicViewTopAppBar(
 @Preview
 @Composable
 fun PlayTopicViewTopAppBarPreview() {
-    val vm = PlayTopicViewModel()
+    val vm = MockPlayTopicViewModel()
     vm.setTopic(sampleTopic00)
     MemTopicTheme {
         PlayTopicViewTopAppBar(

@@ -137,6 +137,39 @@ class AudioPlayerService : Service() {
             setDataSource("data:audio/mp3;base64,$audioBase64")
             prepare()
             start()
+            setOnCompletionListener {
+                serviceScope.launch {
+                    try {
+                        playbackDao.getPlaybackOnce()?.let { p ->
+                            val playback: Playback
+                            if (p.currentRepetition < p.totalRepetitions - 1) {
+                                playback = Playback(
+                                    topicId = p.topicId,
+                                    sentenceIndex = p.sentenceIndex,
+                                    currentRepetition = p.currentRepetition + 1,
+                                    totalRepetitions = p.totalRepetitions,
+                                    isInterval = p.isInterval,
+                                    content = p.content,
+                                )
+                            } else {
+                                val sentences = ContentParser.parseContentToSentences(p.content)
+                                playback = Playback(
+                                    topicId = p.topicId,
+                                    sentenceIndex = (p.sentenceIndex + 1) % sentences.size,
+                                    currentRepetition = 0,
+                                    totalRepetitions = p.totalRepetitions,
+                                    isInterval = p.isInterval,
+                                    content = p.content,
+                                )
+                            }
+                            playbackDao.upsertPlayback(playback)
+                            play(playback)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
         }
     }
 

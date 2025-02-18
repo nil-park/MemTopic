@@ -70,4 +70,9 @@ object TopicDatabaseModule {
     fun provideTopicRepository(topicDao: TopicDao): TopicRepository {
         return TopicRepository(topicDao)
     }
+
+    @Provides
+    fun providePlaybackRepository(playbackDao: PlaybackDao): PlaybackRepository {
+        return PlaybackRepository(playbackDao)
+    }
 }
