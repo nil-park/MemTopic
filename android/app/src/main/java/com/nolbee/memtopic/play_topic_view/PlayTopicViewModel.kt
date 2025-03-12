@@ -17,6 +17,7 @@ import javax.inject.Inject
 interface IPlayTopicViewModel {
     val topicToPlay: Topic
     val playableLines: MutableStateFlow<List<String>>
+    val isCachedLines: MutableStateFlow<List<Boolean>>
     val currentLineIndex: MutableStateFlow<Int>
     fun setTopic(topic: Topic)
     fun setCurrentLine(index: Int)
@@ -31,6 +32,9 @@ class PlayTopicViewModel @Inject constructor(
         private set
 
     override var playableLines = MutableStateFlow<List<String>>(emptyList())
+        private set
+
+    override var isCachedLines = MutableStateFlow<List<Boolean>>(emptyList())
         private set
 
     override var currentLineIndex = MutableStateFlow(-1)
@@ -70,6 +74,9 @@ class MockPlayTopicViewModel : ViewModel(), IPlayTopicViewModel {
         private set
 
     override var playableLines = MutableStateFlow<List<String>>(emptyList())
+        private set
+
+    override var isCachedLines = MutableStateFlow<List<Boolean>>(emptyList())
         private set
 
     override var currentLineIndex = MutableStateFlow(0)
