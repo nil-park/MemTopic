@@ -158,7 +158,12 @@ fun PlayableLineItem(
                     true -> Icons.Default.FileDownloadDone
                     null -> Icons.Default.QuestionMark
                 }
-                Icon(imageVector = icon, contentDescription = null)
+                val tint = when (isCached) {
+                    false -> Color(0xFF8080A0)
+                    true -> Color(0xFF00A000)
+                    null -> Color(0xFFA06060)
+                }
+                Icon(imageVector = icon, contentDescription = null, tint = tint)
             }
         )
         HorizontalDivider()
