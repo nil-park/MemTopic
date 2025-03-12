@@ -1,15 +1,18 @@
 package com.nolbee.memtopic.play_topic_view
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nolbee.memtopic.database.AudioCacheRepository
 import com.nolbee.memtopic.database.PlaybackRepository
 import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.utils.ContentParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +29,8 @@ interface IPlayTopicViewModel {
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PlayTopicViewModel @Inject constructor(
-    private val repository: PlaybackRepository
+    private val playbackRepository: PlaybackRepository,
+    private val audioCacheRepository: AudioCacheRepository,
 ) : ViewModel(), IPlayTopicViewModel {
     override var topicToPlay: Topic by mutableStateOf(Topic())
         private set
@@ -42,14 +46,23 @@ class PlayTopicViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.getPlayback().collect { playback ->
+            playbackRepository.getPlayback().collect { playback ->
                 playback?.let { p ->
                     if (p.topicId != topicToPlay.id)
                         currentLineIndex.value = -1
                     else
                         currentLineIndex.value = p.sentenceIndex
+                    Log.d("PlayTopicViewModel", "currentLineIndex: ${currentLineIndex.value}")
                 }
             }
+        }
+        viewModelScope.launch {
+            playableLines
+                .flatMapLatest { lines -> audioCacheRepository.getIsCachedLines(lines) }
+                .collect {
+                    list -> isCachedLines.value = list
+                    Log.d("PlayTopicViewModel", "isCachedLines: $list")
+                }
         }
     }
 
@@ -63,7 +76,7 @@ class PlayTopicViewModel @Inject constructor(
     override fun setCurrentLine(index: Int) {
         if (index in playableLines.value.indices) {
             viewModelScope.launch {
-                repository.setCurrentLine(index)
+                playbackRepository.setCurrentLine(index)
             }
         }
     }
