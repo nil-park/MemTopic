@@ -22,6 +22,6 @@ interface AudioCacheDao {
     @Query("SELECT audioBase64 FROM audiocache WHERE cacheKey = :cacheKey LIMIT 1")
     suspend fun getCachedAudio(cacheKey: String): String?
 
-    @Query("SELECT audioBase64 FROM audiocache WHERE cacheKey IN (:cacheKeys)")
+    @Query("SELECT * FROM audiocache WHERE cacheKey IN (:cacheKeys)")
     fun getCachedAudioByKeys(cacheKeys: List<String>): Flow<List<AudioCache>>
 }
