@@ -59,8 +59,8 @@ class PlayTopicViewModel @Inject constructor(
         viewModelScope.launch {
             playableLines
                 .flatMapLatest { lines -> audioCacheRepository.getIsCachedLines(lines) }
-                .collect {
-                    list -> isCachedLines.value = list
+                .collect { list ->
+                    isCachedLines.value = list
                     Log.d("PlayTopicViewModel", "isCachedLines: $list")
                 }
         }
@@ -99,6 +99,9 @@ class MockPlayTopicViewModel : ViewModel(), IPlayTopicViewModel {
         this.topicToPlay = topic
         val sentences = ContentParser.parseContentToSentences(topic.content)
         playableLines.update { sentences }
+        val lines = MutableList(minOf(2, sentences.size)) { true }
+        if (sentences.size > 1) lines[1] = false
+        isCachedLines.update { lines }
         setCurrentLine(0)
     }
 

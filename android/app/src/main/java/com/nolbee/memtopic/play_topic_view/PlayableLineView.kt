@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowCircleDown
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.FileDownloadDone
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -32,12 +34,16 @@ fun PlayableLineList(
     vm: IPlayTopicViewModel
 ) {
     val lines by vm.playableLines.collectAsState(initial = emptyList())
+    val currentIndex by vm.currentLineIndex.collectAsState()
+    val isCachedLines by vm.isCachedLines.collectAsState(emptyList())
 
     LazyColumn {
         itemsIndexed(lines) { index, text ->
             PlayableLineItem(
                 index = index,
                 text = text,
+                isPlaying = currentIndex == index,
+                isCached = isCachedLines.getOrNull(index),
                 vm = vm,
             )
         }
@@ -60,11 +66,11 @@ fun PlayableLineListPreview() {
 fun PlayableLineItem(
     index: Int,
     text: String,
+    isPlaying: Boolean,
+    isCached: Boolean?,
     vm: IPlayTopicViewModel,
 ) {
     val context = LocalContext.current
-    val currentIndex by vm.currentLineIndex.collectAsState()
-    val isPlaying = currentIndex == index
     Column {
         ListItem(
             modifier = Modifier
@@ -99,10 +105,12 @@ fun PlayableLineItem(
                 }
             },
             leadingContent = {
-                Icon(
-                    imageVector = Icons.Filled.ArrowCircleDown,
-                    contentDescription = "Select line"
-                )
+                val icon = when (isCached) {
+                    false -> Icons.Default.Cloud
+                    true -> Icons.Default.FileDownloadDone
+                    null -> Icons.Default.QuestionMark
+                }
+                Icon(imageVector = icon, contentDescription = null)
             }
         )
         HorizontalDivider()
