@@ -2,6 +2,12 @@ package com.nolbee.memtopic.play_topic_view
 
 import android.content.Intent
 import android.os.Build
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,12 +26,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.nolbee.memtopic.database.sampleTopic02
 import com.nolbee.memtopic.player.AudioPlayerService
@@ -74,6 +86,26 @@ fun PlayableLineItem(
     vm: IPlayTopicViewModel,
 ) {
     val context = LocalContext.current
+
+    var size by remember { mutableStateOf(IntSize.Zero) }
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val offsetAnimX by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = size.width.toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val offsetAnimY by infiniteTransition.animateFloat(
+        initialValue = size.height.toFloat(),
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
     val rainbowBrush = Brush.sweepGradient(
         listOf(
             Color.Red,
@@ -83,10 +115,13 @@ fun PlayableLineItem(
             Color.Blue,
             Color.Magenta,
             Color.Red
-        )
+        ),
+        center = Offset(offsetAnimX, offsetAnimY)
     )
     val borderModifier = if (isPlaying) {
-        Modifier.border(BorderStroke(2.dp, rainbowBrush))
+        Modifier
+            .border(BorderStroke(2.dp, rainbowBrush))
+            .onSizeChanged { size = it }
     } else {
         Modifier
     }
