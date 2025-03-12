@@ -75,4 +75,9 @@ object TopicDatabaseModule {
     fun providePlaybackRepository(playbackDao: PlaybackDao): PlaybackRepository {
         return PlaybackRepository(playbackDao)
     }
+
+    @Provides
+    fun provideAudioCacheRepository(audioCacheDao: AudioCacheDao): AudioCacheRepository {
+        return AudioCacheRepository(audioCacheDao)
+    }
 }

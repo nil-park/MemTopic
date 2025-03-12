@@ -2,14 +2,23 @@ package com.nolbee.memtopic.play_topic_view
 
 import android.content.Intent
 import android.os.Build
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowCircleDown
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.FileDownloadDone
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -17,11 +26,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import com.nolbee.memtopic.database.sampleTopic02
 import com.nolbee.memtopic.player.AudioPlayerService
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
@@ -32,12 +49,16 @@ fun PlayableLineList(
     vm: IPlayTopicViewModel
 ) {
     val lines by vm.playableLines.collectAsState(initial = emptyList())
+    val currentIndex by vm.currentLineIndex.collectAsState()
+    val isCachedLines by vm.isCachedLines.collectAsState(emptyList())
 
     LazyColumn {
         itemsIndexed(lines) { index, text ->
             PlayableLineItem(
                 index = index,
                 text = text,
+                isPlaying = currentIndex == index,
+                isCached = isCachedLines.getOrNull(index),
                 vm = vm,
             )
         }
@@ -60,12 +81,55 @@ fun PlayableLineListPreview() {
 fun PlayableLineItem(
     index: Int,
     text: String,
+    isPlaying: Boolean,
+    isCached: Boolean?,
     vm: IPlayTopicViewModel,
 ) {
     val context = LocalContext.current
-    val currentIndex by vm.currentLineIndex.collectAsState()
-    val isPlaying = currentIndex == index
-    Column {
+
+    var size by remember { mutableStateOf(IntSize.Zero) }
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val offsetAnimX by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = size.width.toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val offsetAnimY by infiniteTransition.animateFloat(
+        initialValue = size.height.toFloat(),
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val rainbowBrush = Brush.sweepGradient(
+        listOf(
+            Color.Red,
+            Color.Yellow,
+            Color.Green,
+            Color.Cyan,
+            Color.Blue,
+            Color.Magenta,
+            Color.Red
+        ),
+        center = Offset(offsetAnimX, offsetAnimY)
+    )
+    val borderModifier = if (isPlaying) {
+        Modifier
+            .border(BorderStroke(2.dp, rainbowBrush))
+            .onSizeChanged { size = it }
+    } else {
+        Modifier
+    }
+
+    Column(
+        modifier = borderModifier
+            .fillMaxWidth()
+    ) {
         ListItem(
             modifier = Modifier
                 .fillMaxWidth()
@@ -88,21 +152,18 @@ fun PlayableLineItem(
                     fontWeight = if (isPlaying) FontWeight.Bold else FontWeight.Normal
                 )
             },
-            supportingContent = {
-                if (isPlaying) {
-                    Text(
-                        text = "Playing...",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentWidth(Alignment.End)
-                    )
-                }
-            },
             leadingContent = {
-                Icon(
-                    imageVector = Icons.Filled.ArrowCircleDown,
-                    contentDescription = "Select line"
-                )
+                val icon = when (isCached) {
+                    false -> Icons.Default.Cloud
+                    true -> Icons.Default.FileDownloadDone
+                    null -> Icons.Default.QuestionMark
+                }
+                val tint = when (isCached) {
+                    false -> Color(0xFF8080A0)
+                    true -> Color(0xFF00A000)
+                    null -> Color(0xFFA06060)
+                }
+                Icon(imageVector = icon, contentDescription = null, tint = tint)
             }
         )
         HorizontalDivider()
