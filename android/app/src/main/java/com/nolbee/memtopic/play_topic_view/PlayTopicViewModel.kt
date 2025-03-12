@@ -33,15 +33,17 @@ class PlayTopicViewModel @Inject constructor(
     override var playableLines = MutableStateFlow<List<String>>(emptyList())
         private set
 
-    override var currentLineIndex = MutableStateFlow(0)
+    override var currentLineIndex = MutableStateFlow(-1)
         private set
 
     init {
         viewModelScope.launch {
             repository.getPlayback().collect { playback ->
                 playback?.let { p ->
-                    currentLineIndex.value = p.sentenceIndex
-                    // TODO: Update topicToPlay from DB
+                    if (p.topicId != topicToPlay.id)
+                        currentLineIndex.value = -1
+                    else
+                        currentLineIndex.value = p.sentenceIndex
                 }
             }
         }
@@ -51,7 +53,7 @@ class PlayTopicViewModel @Inject constructor(
         this.topicToPlay = topic
         val sentences = ContentParser.parseContentToSentences(topic.content)
         playableLines.update { sentences }
-        setCurrentLine(0)
+        // TODO: If audio player service is not running, setCurrentLine(0)
     }
 
     override fun setCurrentLine(index: Int) {
