@@ -190,9 +190,9 @@ class AudioPlayerService : Service() {
         .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
         .setContentTitle("Audio Player")
         .setContentText("Playing Audio")
-        .setStyle(MediaStyle())
+        .setStyle(MediaStyle().setShowActionsInCompactView(0, 1))
         .setOngoing(true)
-        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .addAction(
             NotificationCompat.Action(
                 android.R.drawable.ic_media_play,
@@ -222,7 +222,7 @@ class AudioPlayerService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Media Playback",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
                 .createNotificationChannel(channel)
