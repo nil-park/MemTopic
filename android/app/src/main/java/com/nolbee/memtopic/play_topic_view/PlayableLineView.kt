@@ -1,7 +1,13 @@
 package com.nolbee.memtopic.play_topic_view
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -39,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.nolbee.memtopic.database.sampleTopic02
 import com.nolbee.memtopic.player.AudioPlayerService
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
@@ -87,6 +94,17 @@ fun PlayableLineItem(
 ) {
     val context = LocalContext.current
 
+    // Preparing notification permission launcher
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            startAudioService(context, vm, index)
+        } else {
+            Log.d("PlayableLineItem", "Notification permission denied")
+        }
+    }
+
     var size by remember { mutableStateOf(IntSize.Zero) }
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -127,23 +145,25 @@ fun PlayableLineItem(
     }
 
     Column(
-        modifier = borderModifier
-            .fillMaxWidth()
+        modifier = borderModifier.fillMaxWidth()
     ) {
         ListItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
                     vm.setCurrentLine(index)
-                    val intent = Intent(context, AudioPlayerService::class.java).apply {
-                        action = AudioPlayerService.ACTION_UPDATE
-                        putExtra(AudioPlayerService.KEY_TOPIC_ID, vm.topicToPlay.id)
-                        putExtra(AudioPlayerService.KEY_SENTENCE_ID, index)
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(intent)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            startAudioService(context, vm, index)
+                        } else {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
                     } else {
-                        context.startService(intent)
+                        startAudioService(context, vm, index)
                     }
                 },
             headlineContent = {
@@ -156,16 +176,33 @@ fun PlayableLineItem(
                 val icon = when (isCached) {
                     false -> Icons.Default.Cloud
                     true -> Icons.Default.FileDownloadDone
-                    null -> Icons.Default.QuestionMark
+                    else -> Icons.Default.QuestionMark
                 }
                 val tint = when (isCached) {
                     false -> Color(0xFF8080A0)
                     true -> Color(0xFF00A000)
-                    null -> Color(0xFFA06060)
+                    else -> Color(0xFFA06060)
                 }
                 Icon(imageVector = icon, contentDescription = null, tint = tint)
             }
         )
         HorizontalDivider()
+    }
+}
+
+private fun startAudioService(
+    context: Context,
+    vm: IPlayTopicViewModel,
+    index: Int
+) {
+    val intent = Intent(context, AudioPlayerService::class.java).apply {
+        action = AudioPlayerService.ACTION_UPDATE
+        putExtra(AudioPlayerService.KEY_TOPIC_ID, vm.topicToPlay.id)
+        putExtra(AudioPlayerService.KEY_SENTENCE_ID, index)
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        context.startForegroundService(intent)
+    } else {
+        context.startService(intent)
     }
 }
