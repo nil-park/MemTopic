@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
+import com.nolbee.memtopic.utils.ContentParser
 import kotlinx.coroutines.flow.Flow
 
 /*
@@ -23,7 +24,19 @@ data class Playback(
     val isInterval: Boolean = false, // Whether the current section is the interval
     val content: String = "",
     // TODO: is playing
-)
+) {
+    fun next(): Playback {
+        return if (currentRepetition < totalRepetitions - 1) {
+            copy(currentRepetition = currentRepetition + 1)
+        } else {
+            val sentences = ContentParser.parseContentToSentences(content)
+            copy(
+                sentenceIndex = (sentenceIndex + 1) % sentences.size,
+                currentRepetition = 0
+            )
+        }
+    }
+}
 
 @Dao
 interface PlaybackDao {
