@@ -79,14 +79,16 @@ class AudioPlayerService : Service() {
     }
 
     private fun buildNotification(): Notification {
+        val exitIntent = Intent(this, AudioPlayerService::class.java).apply { action = ACTION_EXIT }
+        val exitPendingIntent = PendingIntent.getService(
+            this, 0, exitIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val exitAction = NotificationCompat.Action(
             android.R.drawable.ic_menu_close_clear_cancel,
             "Exit",
-            PendingIntent.getService(
-                this, 0,
-                Intent(this, AudioPlayerService::class.java).apply { action = ACTION_EXIT },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            exitPendingIntent
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
@@ -102,6 +104,8 @@ class AudioPlayerService : Service() {
             .setSilent(true)
             .addAction(exitAction)
             .setShowWhen(false)
+            // swipe(삭제) 시 exitIntent 실행
+            .setDeleteIntent(exitPendingIntent)
             .build()
     }
 
