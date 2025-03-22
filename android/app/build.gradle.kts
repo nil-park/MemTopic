@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nolbee.memtopic"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -83,6 +83,9 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
+
+    // ffmpeg dependencies
+    implementation("com.arthenica:ffmpeg-kit-audio:6.0-2")
 
     // other dependencies
     implementation("com.google.code.gson:gson:2.11.0")

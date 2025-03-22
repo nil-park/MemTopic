@@ -200,9 +200,5 @@ private fun startAudioService(
         putExtra(AudioPlayerService.KEY_TOPIC_ID, vm.topicToPlay.id)
         putExtra(AudioPlayerService.KEY_SENTENCE_ID, index)
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        context.startForegroundService(intent)
-    } else {
-        context.startService(intent)
-    }
+    context.startForegroundService(intent)
 }
