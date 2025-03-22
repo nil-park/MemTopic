@@ -57,11 +57,11 @@ object AudioPlayerHelper {
 
     private fun copyIntervalSoundToCacheDir(context: Context): File {
         val intervalSoundFile =
-            File(context.cacheDir, "flowing_stream.mp3").apply { deleteOnExit() }
+            File(context.cacheDir, "intervalSound.mp3").apply { deleteOnExit() }
         if (intervalSoundFile.exists() && intervalSoundFile.length() == 2756022L) {
             return intervalSoundFile
         }
-        context.assets.open("flowing_stream.mp3").use { input ->
+        context.assets.open("quartz_clock.mp3").use { input ->
             FileOutputStream(intervalSoundFile).use { output -> input.copyTo(output) }
         }
         return intervalSoundFile
@@ -70,7 +70,7 @@ object AudioPlayerHelper {
     private fun cutIntervalSound(durationInMillis: Long, context: Context): File {
         val intervalSoundFile = copyIntervalSoundToCacheDir(context)
         val intervalSoundFileShort =
-            File(context.cacheDir, "flowing_stream_short.mp3").apply { deleteOnExit() }
+            File(context.cacheDir, "intervalSoundShort.mp3").apply { deleteOnExit() }
         val cmd =
             "-y -i ${intervalSoundFile.absolutePath} -t ${durationInMillis}ms -c:a libmp3lame -q:a 2 ${intervalSoundFileShort.absolutePath}"
         val session = FFmpegKit.execute(cmd)
