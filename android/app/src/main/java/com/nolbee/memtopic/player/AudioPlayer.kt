@@ -10,6 +10,7 @@ import com.nolbee.memtopic.database.AudioCacheDao
 import com.nolbee.memtopic.database.Playback
 import com.nolbee.memtopic.database.PlaybackDao
 import com.nolbee.memtopic.database.TopicDao
+import com.nolbee.memtopic.utils.AudioPlayerHelper.appendIntervalSound
 import com.nolbee.memtopic.utils.ContentParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class AudioPlayer(
     private val playbackDao: PlaybackDao,
@@ -103,9 +105,10 @@ class AudioPlayer(
         val audioBase64 = getOrSynthesizeAudioForLine(playback)
         withContext(Dispatchers.Main) {
             onUpdateNotification()
+            val audioFile: File = appendIntervalSound(audioBase64, applicationContext)
             mediaPlayer.apply {
                 reset()
-                setDataSource("data:audio/mp3;base64,$audioBase64")
+                setDataSource(audioFile.absolutePath)
                 prepare()
                 start()
                 setOnCompletionListener(onCompletionListener)
