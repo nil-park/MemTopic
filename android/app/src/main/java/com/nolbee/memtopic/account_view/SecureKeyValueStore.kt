@@ -3,6 +3,7 @@ package com.nolbee.memtopic.account_view
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Base64
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -41,29 +42,30 @@ class SecureKeyValueStore(context: Context) {
         val cipher = Cipher.getInstance(cipherTransformation)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
         val encryptedData = cipher.doFinal(data.toByteArray(StandardCharsets.UTF_8))
-        val iv = cipher.iv.joinToString(separator = ",", transform = { byte -> byte.toString() })
+        val iv = cipher.iv
 
-        sharedPreferences.edit().putString(
-            "$key.enc",
-            encryptedData.joinToString(separator = ",", transform = { byte -> byte.toString() })
-        )
-            .putString("$key.iv", iv)
+        sharedPreferences.edit()
+            .putString("$key.enc", Base64.encodeToString(encryptedData, Base64.DEFAULT))
+            .putString("$key.iv", Base64.encodeToString(iv, Base64.DEFAULT))
             .apply()
     }
 
     fun get(key: String): String? {
-        val encryptedData =
-            sharedPreferences.getString("$key.enc", null)?.split(",")?.map { it.toByte() }
-                ?.toByteArray()
-        val iv = sharedPreferences.getString("$key.iv", null)?.split(",")?.map { it.toByte() }
-            ?.toByteArray()
+        val encString = sharedPreferences.getString("$key.enc", null) ?: return null
+        val ivString = sharedPreferences.getString("$key.iv", null) ?: return null
 
-        if (encryptedData == null || iv == null) return null
+        val encryptedData = Base64.decode(encString, Base64.DEFAULT)
+        val iv = Base64.decode(ivString, Base64.DEFAULT)
 
-        val cipher = Cipher.getInstance(cipherTransformation)
-        val spec = GCMParameterSpec(128, iv)
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-        val decryptedData = cipher.doFinal(encryptedData)
-        return String(decryptedData, StandardCharsets.UTF_8)
+        return try {
+            val cipher = Cipher.getInstance(cipherTransformation)
+            val spec = GCMParameterSpec(128, iv)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
+            val decrypted = cipher.doFinal(encryptedData)
+            String(decrypted, StandardCharsets.UTF_8)
+        } catch (e: Exception) {
+            sharedPreferences.edit().clear().apply()
+            null
+        }
     }
 }
