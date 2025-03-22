@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -97,20 +96,22 @@ class AudioPlayerService : Service() {
             .setStyle(MediaStyle().setShowActionsInCompactView(0))
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setDefaults(0)
+            .setSound(null)
+            .setVibrate(null)
+            .setSilent(true)
             .addAction(exitAction)
             .setShowWhen(false)
             .build()
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Media Playback",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
-                .createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Media Playback",
+            NotificationManager.IMPORTANCE_DEFAULT,
+        )
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+            .createNotificationChannel(channel)
     }
 }
