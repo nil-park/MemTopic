@@ -24,6 +24,6 @@ interface SettingsDao {
     @Upsert
     suspend fun upsertSettings(vararg settings: SettingEntity)
 
-    @Query("DELETE FROM setting WHERE settingKey = :key")
-    suspend fun deleteSetting(key: String)
+    @Query("DELETE FROM setting WHERE settingKey IN (:keys)")
+    suspend fun deleteSettings(vararg keys: String)
 }
