@@ -30,7 +30,7 @@ class Converters {
         Topic::class,
         Playback::class,
         AudioCache::class,
-        SettingsDao::class,
+        SettingEntity::class,
     ],
     version = 3
 )
