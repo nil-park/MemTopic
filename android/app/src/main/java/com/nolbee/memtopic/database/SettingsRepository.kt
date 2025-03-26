@@ -9,8 +9,8 @@ class SettingsRepository(private val dao: SettingsDao) {
         return Preferences(
             playbackSpeed = settingsMap[SettingKeys.PLAYBACK_SPEED],
             sentenceReputation = settingsMap[SettingKeys.SENTENCE_REPUTATION],
-            intervalTimeMultiplier = settingsMap[SettingKeys.INTERVAL_TIME_MULTIPLIER],
-            intervalPosition = settingsMap[SettingKeys.INTERVAL_POSITION]
+            preIntervalMultiplier = settingsMap[SettingKeys.PRE_INTERVAL_MULTIPLIER],
+            postIntervalMultiplier = settingsMap[SettingKeys.POST_INTERVAL_MULTIPLIER],
         )
     }
 
