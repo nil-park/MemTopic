@@ -98,7 +98,7 @@ fun ModalNavigationDrawerMain(
                         selected = navController.getCurrentRoute() == "SettingsView",
                         onClick = {
                             scope.launch { drawerState.close() }
-                            navController.navigate("TopicList") {
+                            navController.navigate("SettingsView") {
                                 popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }

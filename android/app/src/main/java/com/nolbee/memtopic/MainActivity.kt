@@ -24,6 +24,7 @@ import com.nolbee.memtopic.edit_topic_view.EditTopicViewTopAppBar
 import com.nolbee.memtopic.play_topic_view.IPlayTopicViewModel
 import com.nolbee.memtopic.play_topic_view.PlayTopicViewModel
 import com.nolbee.memtopic.play_topic_view.PlayTopicViewTopAppBar
+import com.nolbee.memtopic.settings.SettingsViewTopAppBar
 import com.nolbee.memtopic.topic_list_view.TopicListTopAppBar
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -97,6 +98,13 @@ fun MainView(
                     PlayTopicViewTopAppBar(
                         vm = playTopicViewModel,
                     )
+                }
+                composable(
+                    "SettingsView",
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None }
+                ) {
+                    SettingsViewTopAppBar()
                 }
             }
         }
