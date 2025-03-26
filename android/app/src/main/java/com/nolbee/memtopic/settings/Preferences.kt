@@ -8,22 +8,29 @@ object SettingKeys {
 }
 
 data class Preferences(
-    val playbackSpeed: Float,
-    val sentenceReputation: Int,
-    val preIntervalMultiplier: Float,
-    val postIntervalMultiplier: Float,
+    val playbackSpeed: Float = DEFAULT_PLAYBACK_SPEED,
+    val sentenceReputation: Int = DEFAULT_SENTENCE_REPUTATION,
+    val preIntervalMultiplier: Float = DEFAULT_PRE_INTERVAL_MULTIPLIER,
+    val postIntervalMultiplier: Float = DEFAULT_POST_INTERVAL_MULTIPLIER,
 ) {
-    constructor(
-        playbackSpeed: String?,
-        sentenceReputation: String?,
-        preIntervalMultiplier: String?,
-        postIntervalMultiplier: String?,
-    ) : this(
-        playbackSpeed?.toFloatOrNull() ?: 1.0f,
-        sentenceReputation?.toIntOrNull() ?: 2,
-        preIntervalMultiplier?.toFloatOrNull() ?: 0.0f,
-        postIntervalMultiplier?.toFloatOrNull() ?: 1.0f
-    )
+    companion object {
+        const val DEFAULT_PLAYBACK_SPEED = 1.0f
+        const val DEFAULT_SENTENCE_REPUTATION = 2
+        const val DEFAULT_PRE_INTERVAL_MULTIPLIER = 0.0f
+        const val DEFAULT_POST_INTERVAL_MULTIPLIER = 1.0f
+
+        fun fromStrings(
+            playbackSpeed: String?,
+            sentenceReputation: String?,
+            preIntervalMultiplier: String?,
+            postIntervalMultiplier: String?,
+        ) = Preferences(
+            playbackSpeed = playbackSpeed?.toFloatOrNull() ?: DEFAULT_PLAYBACK_SPEED,
+            sentenceReputation = sentenceReputation?.toIntOrNull() ?: DEFAULT_SENTENCE_REPUTATION,
+            preIntervalMultiplier = preIntervalMultiplier?.toFloatOrNull() ?: DEFAULT_PRE_INTERVAL_MULTIPLIER,
+            postIntervalMultiplier = postIntervalMultiplier?.toFloatOrNull() ?: DEFAULT_POST_INTERVAL_MULTIPLIER,
+        )
+    }
 
     fun toSettingsMap(): Map<String, String> {
         return mapOf(
