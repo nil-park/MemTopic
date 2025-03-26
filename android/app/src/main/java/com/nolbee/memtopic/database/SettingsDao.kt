@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "setting")
 data class SettingEntity(
@@ -15,11 +16,8 @@ data class SettingEntity(
 
 @Dao
 interface SettingsDao {
-    @Query("SELECT * FROM setting WHERE settingKey = :key LIMIT 1")
-    suspend fun getSetting(key: String): SettingEntity?
-
     @Query("SELECT * FROM setting")
-    suspend fun getAllSettings(): List<SettingEntity>
+    fun getAllSettings(): Flow<List<SettingEntity>>
 
     @Upsert
     suspend fun upsertSettings(vararg settings: SettingEntity)
