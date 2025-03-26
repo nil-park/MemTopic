@@ -1,47 +1,36 @@
 package com.nolbee.memtopic.settings
 
-enum class IntervalPosition {
-    BEFORE, AFTER;
-
-    companion object {
-        fun fromString(value: String): IntervalPosition {
-            return when (value.uppercase()) {
-                "BEFORE" -> BEFORE
-                else -> AFTER
-            }
-        }
-    }
-}
-
 object SettingKeys {
     const val PLAYBACK_SPEED = "playbackSpeed"
     const val SENTENCE_REPUTATION = "sentenceReputation"
-    const val INTERVAL_TIME_MULTIPLIER = "intervalTimeMultiplier"
-    const val INTERVAL_POSITION = "intervalPosition"
+    const val PRE_INTERVAL_MULTIPLIER = "preIntervalMultiplier"
+    const val POST_INTERVAL_MULTIPLIER = "postIntervalMultiplier"
 }
 
 data class Preferences(
     val playbackSpeed: Float,
     val sentenceReputation: Int,
-    val intervalTimeMultiplier: Float,
-    val intervalPosition: IntervalPosition,
+    val preIntervalMultiplier: Float,
+    val postIntervalMultiplier: Float,
 ) {
     constructor(
         playbackSpeed: String?,
         sentenceReputation: String?,
-        intervalTimeMultiplier: String?,
-        intervalPosition: String?
-    ) : this(playbackSpeed?.toFloatOrNull() ?: 1.0f,
+        preIntervalMultiplier: String?,
+        postIntervalMultiplier: String?,
+    ) : this(
+        playbackSpeed?.toFloatOrNull() ?: 1.0f,
         sentenceReputation?.toIntOrNull() ?: 2,
-        intervalTimeMultiplier?.toFloatOrNull() ?: 1.0f,
-        intervalPosition?.let { IntervalPosition.fromString(it) } ?: IntervalPosition.AFTER)
+        preIntervalMultiplier?.toFloatOrNull() ?: 0.0f,
+        postIntervalMultiplier?.toFloatOrNull() ?: 1.0f
+    )
 
     fun toSettingsMap(): Map<String, String> {
         return mapOf(
             SettingKeys.PLAYBACK_SPEED to playbackSpeed.toString(),
             SettingKeys.SENTENCE_REPUTATION to sentenceReputation.toString(),
-            SettingKeys.INTERVAL_TIME_MULTIPLIER to intervalTimeMultiplier.toString(),
-            SettingKeys.INTERVAL_POSITION to intervalPosition.toString()
+            SettingKeys.PRE_INTERVAL_MULTIPLIER to preIntervalMultiplier.toString(),
+            SettingKeys.POST_INTERVAL_MULTIPLIER to postIntervalMultiplier.toString(),
         )
     }
 }
