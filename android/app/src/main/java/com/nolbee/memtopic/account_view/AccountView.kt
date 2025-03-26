@@ -64,7 +64,7 @@ fun AccountViewTopAppBar(
 
 @Preview
 @Composable
-fun ConfigViewTopAppBarPreview() {
+fun AccountViewTopAppBarPreview() {
     MemTopicTheme {
         AccountViewTopAppBar(viewModel = MockAccountViewModel())
     }

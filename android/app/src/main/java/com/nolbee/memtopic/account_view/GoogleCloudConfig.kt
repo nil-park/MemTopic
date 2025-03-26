@@ -76,6 +76,6 @@ private fun TTSTokenTextField(viewModel: IAccountViewModel) {
 
 @Preview
 @Composable
-private fun GoogleCloudConfigViewPreview() {
+private fun GoogleCloudAccountViewPreview() {
     GoogleCloudAccountView(MockAccountViewModel())
 }

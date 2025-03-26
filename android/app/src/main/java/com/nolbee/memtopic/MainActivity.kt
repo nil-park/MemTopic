@@ -53,7 +53,7 @@ fun MainView(
         navHost = {
             NavHost(navController = navController, startDestination = "TopicList") {
                 composable(
-                    "ConfigView",
+                    "AccountView",
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None }
                 ) {
