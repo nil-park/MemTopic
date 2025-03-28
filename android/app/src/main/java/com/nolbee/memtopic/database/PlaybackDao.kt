@@ -25,14 +25,18 @@ data class Playback(
     val content: String = "",
     // TODO: is playing
 ) {
-    fun next(): Playback {
-        return if (currentRepetition < totalRepetitions - 1) {
-            copy(currentRepetition = currentRepetition + 1)
+    fun next(newTotalRepetitions: Int): Playback {
+        return if (currentRepetition < newTotalRepetitions - 1) {
+            copy(
+                currentRepetition = currentRepetition + 1,
+                totalRepetitions = newTotalRepetitions,
+            )
         } else {
             val sentences = ContentParser.parseContentToSentences(content)
             copy(
                 sentenceIndex = (sentenceIndex + 1) % sentences.size,
-                currentRepetition = 0
+                currentRepetition = 0,
+                totalRepetitions = newTotalRepetitions,
             )
         }
     }
