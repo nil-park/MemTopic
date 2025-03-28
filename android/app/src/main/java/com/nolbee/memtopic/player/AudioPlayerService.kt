@@ -12,6 +12,8 @@ import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.nolbee.memtopic.database.AudioCacheDao
 import com.nolbee.memtopic.database.PlaybackDao
+import com.nolbee.memtopic.database.SettingsDao
+import com.nolbee.memtopic.database.SettingsRepository
 import com.nolbee.memtopic.database.TopicDao
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -36,14 +38,24 @@ class AudioPlayerService : Service() {
     @Inject
     lateinit var audioCacheDao: AudioCacheDao
 
+    @Inject
+    lateinit var settingsDao: SettingsDao
+
     private lateinit var audioPlayer: AudioPlayer
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        audioPlayer = AudioPlayer(playbackDao, topicDao, audioCacheDao, applicationContext) {
-            updateNotification()
-        }
+        audioPlayer =
+            AudioPlayer(
+                playbackDao = playbackDao,
+                topicDao = topicDao,
+                audioCacheDao = audioCacheDao,
+                settingsRepository = SettingsRepository(settingsDao),
+                applicationContext = applicationContext
+            ) {
+                updateNotification()
+            }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

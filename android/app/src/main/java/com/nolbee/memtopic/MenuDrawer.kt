@@ -64,10 +64,10 @@ fun ModalNavigationDrawerMain(
                     NavigationDrawerItem(
                         icon = { Icon(Icons.Default.ManageAccounts, contentDescription = null) },
                         label = { Text("계정 관리") }, // TODO: replace this string with a string resource to achieve multi-language support.
-                        selected = navController.getCurrentRoute() == "ConfigView",
+                        selected = navController.getCurrentRoute() == "AccountView",
                         onClick = {
                             scope.launch { drawerState.close() }
-                            navController.navigate("ConfigView") {
+                            navController.navigate("AccountView") {
                                 popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }
@@ -98,7 +98,7 @@ fun ModalNavigationDrawerMain(
                         selected = navController.getCurrentRoute() == "SettingsView",
                         onClick = {
                             scope.launch { drawerState.close() }
-                            navController.navigate("TopicList") {
+                            navController.navigate("SettingsView") {
                                 popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }
@@ -131,7 +131,7 @@ fun ModalNavigationDrawerMainPreview() {
             navController = navController,
             navHost = {
                 NavHost(navController = navController, startDestination = "TopicList") {
-                    composable("ConfigView") { NavigationContentSample() }
+                    composable("AccountView") { NavigationContentSample() }
                     composable("TopicList") { NavigationContentSample() }
                     composable("EditTopicView") { NavigationContentSample() }
                 }

@@ -30,8 +30,9 @@ class Converters {
         Topic::class,
         Playback::class,
         AudioCache::class,
+        SettingEntity::class,
     ],
-    version = 3
+    version = 4
 )
 @TypeConverters(
     Converters::class
@@ -40,6 +41,7 @@ abstract class TopicDatabase : RoomDatabase() {
     abstract fun topicDao(): TopicDao
     abstract fun playbackDao(): PlaybackDao
     abstract fun audioCacheDao(): AudioCacheDao
+    abstract fun settingsDao(): SettingsDao
 }
 
 @Module
@@ -48,7 +50,9 @@ object TopicDatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(app: Application): TopicDatabase {
-        return Room.databaseBuilder(app, TopicDatabase::class.java, "topicDatabase").build()
+        return Room.databaseBuilder(app, TopicDatabase::class.java, "topicDatabase")
+            .addMigrations(MIGRATION_3_4)
+            .build()
     }
 
     @Provides
@@ -67,6 +71,11 @@ object TopicDatabaseModule {
     }
 
     @Provides
+    fun provideSettingsDao(db: TopicDatabase): SettingsDao {
+        return db.settingsDao()
+    }
+
+    @Provides
     fun provideTopicRepository(topicDao: TopicDao): TopicRepository {
         return TopicRepository(topicDao)
     }
@@ -79,5 +88,10 @@ object TopicDatabaseModule {
     @Provides
     fun provideAudioCacheRepository(audioCacheDao: AudioCacheDao): AudioCacheRepository {
         return AudioCacheRepository(audioCacheDao)
+    }
+
+    @Provides
+    fun provideSettingsRepository(settingsDao: SettingsDao): SettingsRepository {
+        return SettingsRepository(settingsDao)
     }
 }

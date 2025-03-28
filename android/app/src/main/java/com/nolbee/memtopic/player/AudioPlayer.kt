@@ -1,7 +1,6 @@
 package com.nolbee.memtopic.player
 
 import android.content.Context
-import android.media.MediaPlayer
 import android.util.Log
 import com.nolbee.memtopic.account_view.SecureKeyValueStore
 import com.nolbee.memtopic.client.TextToSpeechGCP
@@ -9,8 +8,9 @@ import com.nolbee.memtopic.database.AudioCache
 import com.nolbee.memtopic.database.AudioCacheDao
 import com.nolbee.memtopic.database.Playback
 import com.nolbee.memtopic.database.PlaybackDao
+import com.nolbee.memtopic.database.SettingsRepository
 import com.nolbee.memtopic.database.TopicDao
-import com.nolbee.memtopic.utils.AudioPlayerHelper.appendIntervalSound
+import com.nolbee.memtopic.settings.Settings
 import com.nolbee.memtopic.utils.ContentParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,16 +18,17 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class AudioPlayer(
     private val playbackDao: PlaybackDao,
     private val topicDao: TopicDao,
     private val audioCacheDao: AudioCacheDao,
+    private val settingsRepository: SettingsRepository,
     private val applicationContext: Context,
     private val onUpdateNotification: () -> Unit,
 ) {
-    private val mediaPlayer: MediaPlayer = MediaPlayer()
+    private val mediaPlayerWithIntervalSound =
+        MediaPlayerWithIntervalSound(applicationContext) { playAudioLoopEnd() }
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     var notificationTitle: String = "Audio Player"
     var notificationText: String = "Sentence: 0/0, Repetition: 0/0"
@@ -54,6 +55,7 @@ class AudioPlayer(
 
     private suspend fun updateCurrentPlayback(topicId: Int, sentenceIndex: Int): Playback {
         val topic = topicDao.getTopic(topicId)
+        val settings = settingsRepository.getSettings()
         if (topic == null) {
             val msg = "Topic not found for ID: $topicId"
             Log.e("AudioPlayer", msg)
@@ -62,16 +64,18 @@ class AudioPlayer(
             throw Exception(msg)
         }
         val sentences = ContentParser.parseContentToSentences(topic.content)
-        val repetition = 0
-        val totalRepetitions = 2 // TODO: get from Player Setting
+        val sentenceIndexText = "Sentence: ${sentenceIndex + 1}/${sentences.size}"
+        val repetitionsText = when (settings.sentenceReputation) {
+            Int.MAX_VALUE -> "Repetition: 1"
+            else -> "Repetition: 1/${settings.sentenceReputation}"
+        }
         notificationTitle = topic.title
-        notificationText =
-            "Sentence: ${sentenceIndex + 1}/${sentences.size}, Repetition: ${repetition + 1}/$totalRepetitions"
+        notificationText = "$sentenceIndexText, $repetitionsText"
         val playback = Playback(
             topicId = topicId,
             sentenceIndex = sentenceIndex,
-            currentRepetition = repetition,
-            totalRepetitions = totalRepetitions,
+            currentRepetition = 0,
+            totalRepetitions = settings.sentenceReputation,
             isInterval = false,
             content = topic.content,
         )
@@ -79,8 +83,9 @@ class AudioPlayer(
         return playback
     }
 
-    private val onCompletionListener = MediaPlayer.OnCompletionListener {
+    private fun playAudioLoopEnd() {
         serviceScope.launch {
+            val settings = settingsRepository.getSettings()
             val currPlayback = playbackDao.getPlaybackOnce()
             if (currPlayback == null) {
                 val msg = "Playback not found"
@@ -89,53 +94,53 @@ class AudioPlayer(
                 notificationText = msg
                 return@launch
             }
-            val nextPlayback = currPlayback.next()
+            val nextPlayback = currPlayback.next(settings.sentenceReputation)
             val sentences = ContentParser.parseContentToSentences(nextPlayback.content)
             val sentenceIndex = nextPlayback.sentenceIndex
-            val repetition = nextPlayback.currentRepetition
-            val totalRepetitions = nextPlayback.totalRepetitions
-            notificationText =
-                "Sentence: ${sentenceIndex + 1}/${sentences.size}, Repetition: ${repetition + 1}/$totalRepetitions"
+            val sentenceIndexText = "Sentence: ${sentenceIndex + 1}/${sentences.size}"
+            val repetitionsText = when (settings.sentenceReputation) {
+                Int.MAX_VALUE -> "Repetition: ${nextPlayback.currentRepetition + 1}"
+                else -> "Repetition: ${nextPlayback.currentRepetition + 1}/${settings.sentenceReputation}"
+            }
+            notificationText = "$sentenceIndexText, $repetitionsText"
             playbackDao.upsertPlayback(nextPlayback)
-            playAudioLoop(nextPlayback)
+            playAudioLoop(nextPlayback, settings)
         }
     }
 
-    private suspend fun playAudioLoop(playback: Playback) {
+    private suspend fun playAudioLoop(playback: Playback, settings: Settings) {
         val audioBase64 = getOrSynthesizeAudioForLine(playback)
         withContext(Dispatchers.Main) {
             onUpdateNotification()
-            val audioFile: File = appendIntervalSound(audioBase64, applicationContext)
-            mediaPlayer.apply {
-                reset()
-                setDataSource(audioFile.absolutePath)
-                prepare()
-                start()
-                setOnCompletionListener(onCompletionListener)
-            }
+            mediaPlayerWithIntervalSound.play(audioBase64, playback, settings)
         }
     }
 
     fun play(topicId: Int, sentenceIndex: Int) {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.stop()
+        serviceScope.launch(Dispatchers.Main) {
+            mediaPlayerWithIntervalSound.stop()
         }
         serviceScope.launch {
             try {
                 val playback = updateCurrentPlayback(topicId, sentenceIndex)
-                playAudioLoop(playback)
-            } catch (e: Exception) {
+                val settings = settingsRepository.getSettings()
+                playAudioLoop(playback, settings)
+            } catch (_: Exception) {
                 onUpdateNotification()
             }
         }
     }
 
     fun stop() {
-        mediaPlayer.takeIf { it.isPlaying }?.stop()
+        serviceScope.launch(Dispatchers.Main) {
+            mediaPlayerWithIntervalSound.stop()
+        }
     }
 
     fun release() {
-        mediaPlayer.release()
+        serviceScope.launch(Dispatchers.Main) {
+            mediaPlayerWithIntervalSound.release()
+        }
         serviceScope.cancel()
     }
 }
