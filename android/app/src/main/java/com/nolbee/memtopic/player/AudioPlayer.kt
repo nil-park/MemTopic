@@ -1,7 +1,6 @@
 package com.nolbee.memtopic.player
 
 import android.content.Context
-import android.media.MediaPlayer
 import android.util.Log
 import com.nolbee.memtopic.account_view.SecureKeyValueStore
 import com.nolbee.memtopic.client.TextToSpeechGCP
@@ -11,7 +10,7 @@ import com.nolbee.memtopic.database.Playback
 import com.nolbee.memtopic.database.PlaybackDao
 import com.nolbee.memtopic.database.SettingsRepository
 import com.nolbee.memtopic.database.TopicDao
-import com.nolbee.memtopic.utils.AudioPlayerHelper.appendIntervalSound
+import com.nolbee.memtopic.settings.Settings
 import com.nolbee.memtopic.utils.ContentParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,12 +27,8 @@ class AudioPlayer(
     private val applicationContext: Context,
     private val onUpdateNotification: () -> Unit,
 ) {
-    private val mediaPlayer: MediaPlayer = MediaPlayer().apply {
-        setOnErrorListener { _, what, extra ->
-            Log.e("AudioPlayer", "MediaPlayer Error: what=$what, extra=$extra")
-            false
-        }
-    }
+    private val mediaPlayerWithIntervalSound =
+        MediaPlayerWithIntervalSound(applicationContext) { playAudioLoopEnd() }
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     var notificationTitle: String = "Audio Player"
     var notificationText: String = "Sentence: 0/0, Repetition: 0/0"
@@ -88,7 +83,7 @@ class AudioPlayer(
         return playback
     }
 
-    private val onCompletionListener = MediaPlayer.OnCompletionListener {
+    private fun playAudioLoopEnd() {
         serviceScope.launch {
             val settings = settingsRepository.getSettings()
             val currPlayback = playbackDao.getPlaybackOnce()
@@ -109,35 +104,27 @@ class AudioPlayer(
             }
             notificationText = "$sentenceIndexText, $repetitionsText"
             playbackDao.upsertPlayback(nextPlayback)
-            playAudioLoop(nextPlayback)
+            playAudioLoop(nextPlayback, settings)
         }
     }
 
-    private suspend fun playAudioLoop(playback: Playback) {
+    private suspend fun playAudioLoop(playback: Playback, settings: Settings) {
         val audioBase64 = getOrSynthesizeAudioForLine(playback)
-        val audioFile = withContext(Dispatchers.IO) {
-            appendIntervalSound(audioBase64, applicationContext)
-        }
         withContext(Dispatchers.Main) {
             onUpdateNotification()
-            mediaPlayer.apply {
-                reset()
-                setDataSource(audioFile.absolutePath)
-                prepare()
-                setOnCompletionListener(onCompletionListener)
-                start()
-            }
+            mediaPlayerWithIntervalSound.play(audioBase64, playback, settings)
         }
     }
 
     fun play(topicId: Int, sentenceIndex: Int) {
         serviceScope.launch(Dispatchers.Main) {
-            mediaPlayer.takeIf { it.isPlaying }?.stop()
+            mediaPlayerWithIntervalSound.stop()
         }
         serviceScope.launch {
             try {
                 val playback = updateCurrentPlayback(topicId, sentenceIndex)
-                playAudioLoop(playback)
+                val settings = settingsRepository.getSettings()
+                playAudioLoop(playback, settings)
             } catch (_: Exception) {
                 onUpdateNotification()
             }
@@ -146,17 +133,13 @@ class AudioPlayer(
 
     fun stop() {
         serviceScope.launch(Dispatchers.Main) {
-            mediaPlayer.takeIf { it.isPlaying }?.stop()
+            mediaPlayerWithIntervalSound.stop()
         }
     }
 
     fun release() {
         serviceScope.launch(Dispatchers.Main) {
-            mediaPlayer.setOnCompletionListener(null)
-            mediaPlayer.setOnErrorListener(null)
-            mediaPlayer.takeIf { it.isPlaying }?.stop()
-            mediaPlayer.reset()
-            mediaPlayer.release()
+            mediaPlayerWithIntervalSound.release()
         }
         serviceScope.cancel()
     }
