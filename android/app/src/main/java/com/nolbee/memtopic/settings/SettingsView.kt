@@ -45,50 +45,52 @@ fun SettingsViewTopAppBar(
                 if (!vm.isInitialized) {
                     return@Column
                 }
-                Text("플레이 속도: ${vm.preferences.playbackSpeed}") // TODO: replace this string with a string resource to achieve multi-language support.
+                Text("플레이 속도: ${vm.settings.playbackSpeed}") // TODO: replace this string with a string resource to achieve multi-language support.
                 Slider(
-                    value = vm.preferences.playbackSpeed,
-                    onValueChange = { vm.updatePreferences(vm.preferences.copy(playbackSpeed = it)) },
+                    value = vm.settings.playbackSpeed,
+                    onValueChange = { vm.updateSettings(vm.settings.copy(playbackSpeed = it)) },
                     valueRange = 0.5f..2.0f,
                     steps = 5
                 )
-                Text("문장 반복 회수: ${vm.preferences.sentenceReputation}") // TODO: replace this string with a string resource to achieve multi-language support.
+                Text("문장 반복 회수: ${vm.settings.sentenceReputation}") // TODO: replace this string with a string resource to achieve multi-language support.
                 Row(
                     Modifier.selectableGroup(),
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     Text("1회")
-                    RadioButton(selected = vm.preferences.sentenceReputation == 1, onClick = {
-                        vm.updatePreferences(vm.preferences.copy(sentenceReputation = 1))
+                    RadioButton(selected = vm.settings.sentenceReputation == 1, onClick = {
+                        vm.updateSettings(vm.settings.copy(sentenceReputation = 1))
                     })
                     Text("2회")
-                    RadioButton(selected = vm.preferences.sentenceReputation == 2, onClick = {
-                        vm.updatePreferences(vm.preferences.copy(sentenceReputation = 2))
+                    RadioButton(selected = vm.settings.sentenceReputation == 2, onClick = {
+                        vm.updateSettings(vm.settings.copy(sentenceReputation = 2))
                     })
                     Text("3회")
-                    RadioButton(selected = vm.preferences.sentenceReputation == 3, onClick = {
-                        vm.updatePreferences(vm.preferences.copy(sentenceReputation = 3))
+                    RadioButton(selected = vm.settings.sentenceReputation == 3, onClick = {
+                        vm.updateSettings(vm.settings.copy(sentenceReputation = 3))
                     })
                     Text("5회")
-                    RadioButton(selected = vm.preferences.sentenceReputation == 5, onClick = {
-                        vm.updatePreferences(vm.preferences.copy(sentenceReputation = 5))
+                    RadioButton(selected = vm.settings.sentenceReputation == 5, onClick = {
+                        vm.updateSettings(vm.settings.copy(sentenceReputation = 5))
                     })
                     Text("계속")
-                    RadioButton(selected = vm.preferences.sentenceReputation == Int.MAX_VALUE, onClick = {
-                        vm.updatePreferences(vm.preferences.copy(sentenceReputation = Int.MAX_VALUE))
-                    })
+                    RadioButton(
+                        selected = vm.settings.sentenceReputation == Int.MAX_VALUE,
+                        onClick = {
+                            vm.updateSettings(vm.settings.copy(sentenceReputation = Int.MAX_VALUE))
+                        })
                 }
-                Text("발화 전 대기 시간 비율: ${vm.preferences.preIntervalMultiplier}") // TODO: replace this string with a string resource to achieve multi-language support.)
+                Text("발화 전 대기 시간 비율: ${vm.settings.preIntervalMultiplier}") // TODO: replace this string with a string resource to achieve multi-language support.)
                 Slider(
-                    value = vm.preferences.preIntervalMultiplier,
-                    onValueChange = { vm.updatePreferences(vm.preferences.copy(preIntervalMultiplier = it)) },
+                    value = vm.settings.preIntervalMultiplier,
+                    onValueChange = { vm.updateSettings(vm.settings.copy(preIntervalMultiplier = it)) },
                     valueRange = 0.0f..3.0f,
                     steps = 5
                 )
-                Text("발화 후 대기 시간 비율: ${vm.preferences.postIntervalMultiplier}") // TODO: replace this string with a string resource to achieve multi-language support.)
+                Text("발화 후 대기 시간 비율: ${vm.settings.postIntervalMultiplier}") // TODO: replace this string with a string resource to achieve multi-language support.)
                 Slider(
-                    value = vm.preferences.postIntervalMultiplier,
-                    onValueChange = { vm.updatePreferences(vm.preferences.copy(postIntervalMultiplier = it)) },
+                    value = vm.settings.postIntervalMultiplier,
+                    onValueChange = { vm.updateSettings(vm.settings.copy(postIntervalMultiplier = it)) },
                     valueRange = 0.0f..3.0f,
                     steps = 5
                 )

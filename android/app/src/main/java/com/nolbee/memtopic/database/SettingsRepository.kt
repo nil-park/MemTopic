@@ -1,12 +1,12 @@
 package com.nolbee.memtopic.database
 
-import com.nolbee.memtopic.settings.Preferences
 import com.nolbee.memtopic.settings.SettingKeys
+import com.nolbee.memtopic.settings.Settings
 
 class SettingsRepository(private val dao: SettingsDao) {
-    suspend fun getPreferences(): Preferences {
+    suspend fun getSettings(): Settings {
         val settingsMap = dao.getAllSettings().associate { it.settingKey to it.settingValue }
-        return Preferences.fromStrings(
+        return Settings.fromStrings(
             playbackSpeed = settingsMap[SettingKeys.PLAYBACK_SPEED],
             sentenceReputation = settingsMap[SettingKeys.SENTENCE_REPUTATION],
             preIntervalMultiplier = settingsMap[SettingKeys.PRE_INTERVAL_MULTIPLIER],
@@ -14,9 +14,9 @@ class SettingsRepository(private val dao: SettingsDao) {
         )
     }
 
-    suspend fun setPreferences(prefs: Preferences) {
+    suspend fun setSettings(settings: Settings) {
         val settingsMapPrev = dao.getAllSettings().associate { it.settingKey to it.settingValue }
-        val settingsMapNext = prefs.toSettingsMap()
+        val settingsMapNext = settings.toSettingsMap()
         val entities = settingsMapNext.map { (key, value) ->
             SettingEntity(settingKey = key, settingValue = value)
         }

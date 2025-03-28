@@ -12,14 +12,14 @@ import javax.inject.Inject
 
 interface ISettingsViewModel {
     val isInitialized: Boolean
-    val preferences: Preferences
-    fun updatePreferences(prefs: Preferences)
+    val settings: Settings
+    fun updateSettings(settings: Settings)
 }
 
 class MockSettingsViewModel : ISettingsViewModel {
     override val isInitialized = true
-    override val preferences = Preferences()
-    override fun updatePreferences(prefs: Preferences) {}
+    override val settings = Settings()
+    override fun updateSettings(settings: Settings) {}
 }
 
 @HiltViewModel
@@ -30,21 +30,21 @@ class SettingsViewModel @Inject constructor(
     override var isInitialized by mutableStateOf(false)
         private set
 
-    override var preferences by mutableStateOf(Preferences())
+    override var settings by mutableStateOf(Settings())
         private set
 
-    override fun updatePreferences(prefs: Preferences) {
+    override fun updateSettings(settings: Settings) {
         if (isInitialized) {
-            preferences = prefs
+            this.settings = settings
             viewModelScope.launch {
-                repository.setPreferences(prefs)
+                repository.setSettings(settings)
             }
         }
     }
 
     init {
         viewModelScope.launch {
-            preferences = repository.getPreferences()
+            settings = repository.getSettings()
             isInitialized = true
         }
     }

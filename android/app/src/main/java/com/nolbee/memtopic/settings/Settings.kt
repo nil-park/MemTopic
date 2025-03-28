@@ -7,7 +7,7 @@ object SettingKeys {
     const val POST_INTERVAL_MULTIPLIER = "postIntervalMultiplier"
 }
 
-data class Preferences(
+data class Settings(
     val playbackSpeed: Float = DEFAULT_PLAYBACK_SPEED,
     val sentenceReputation: Int = DEFAULT_SENTENCE_REPUTATION,
     val preIntervalMultiplier: Float = DEFAULT_PRE_INTERVAL_MULTIPLIER,
@@ -24,7 +24,7 @@ data class Preferences(
             sentenceReputation: String?,
             preIntervalMultiplier: String?,
             postIntervalMultiplier: String?,
-        ) = Preferences(
+        ) = Settings(
             playbackSpeed = playbackSpeed?.toFloatOrNull() ?: DEFAULT_PLAYBACK_SPEED,
             sentenceReputation = sentenceReputation?.toIntOrNull() ?: DEFAULT_SENTENCE_REPUTATION,
             preIntervalMultiplier = preIntervalMultiplier?.toFloatOrNull() ?: DEFAULT_PRE_INTERVAL_MULTIPLIER,
