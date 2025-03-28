@@ -19,7 +19,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class AudioPlayer(
     private val playbackDao: PlaybackDao,
@@ -29,7 +28,12 @@ class AudioPlayer(
     private val applicationContext: Context,
     private val onUpdateNotification: () -> Unit,
 ) {
-    private val mediaPlayer: MediaPlayer = MediaPlayer()
+    private val mediaPlayer: MediaPlayer = MediaPlayer().apply {
+        setOnErrorListener { _, what, extra ->
+            Log.e("AudioPlayer", "MediaPlayer Error: what=$what, extra=$extra")
+            false
+        }
+    }
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     var notificationTitle: String = "Audio Player"
     var notificationText: String = "Sentence: 0/0, Repetition: 0/0"
@@ -111,39 +115,49 @@ class AudioPlayer(
 
     private suspend fun playAudioLoop(playback: Playback) {
         val audioBase64 = getOrSynthesizeAudioForLine(playback)
+        val audioFile = withContext(Dispatchers.IO) {
+            appendIntervalSound(audioBase64, applicationContext)
+        }
         withContext(Dispatchers.Main) {
             onUpdateNotification()
-            val audioFile: File = appendIntervalSound(audioBase64, applicationContext)
             mediaPlayer.apply {
                 reset()
                 setDataSource(audioFile.absolutePath)
                 prepare()
-                start()
                 setOnCompletionListener(onCompletionListener)
+                start()
             }
         }
     }
 
     fun play(topicId: Int, sentenceIndex: Int) {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.stop()
+        serviceScope.launch(Dispatchers.Main) {
+            mediaPlayer.takeIf { it.isPlaying }?.stop()
         }
         serviceScope.launch {
             try {
                 val playback = updateCurrentPlayback(topicId, sentenceIndex)
                 playAudioLoop(playback)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 onUpdateNotification()
             }
         }
     }
 
     fun stop() {
-        mediaPlayer.takeIf { it.isPlaying }?.stop()
+        serviceScope.launch(Dispatchers.Main) {
+            mediaPlayer.takeIf { it.isPlaying }?.stop()
+        }
     }
 
     fun release() {
-        mediaPlayer.release()
+        serviceScope.launch(Dispatchers.Main) {
+            mediaPlayer.setOnCompletionListener(null)
+            mediaPlayer.setOnErrorListener(null)
+            mediaPlayer.takeIf { it.isPlaying }?.stop()
+            mediaPlayer.reset()
+            mediaPlayer.release()
+        }
         serviceScope.cancel()
     }
 }
