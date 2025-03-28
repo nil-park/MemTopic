@@ -87,7 +87,7 @@ class MediaPlayerWithIntervalSound(
             "Interval sound offset: $offset out of ${mediaPlayer.duration}"
         )
         mediaPlayer.seekTo(offset)
-        mediaPlayer.setVolume(0.3f, 0.3f)
+        mediaPlayer.setVolume(0.15f, 0.15f)
         mediaPlayer.setOnCompletionListener(onCompletionListener)
         mediaPlayer.start()
     }
