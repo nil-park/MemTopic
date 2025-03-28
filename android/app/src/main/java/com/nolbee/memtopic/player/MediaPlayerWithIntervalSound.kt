@@ -68,8 +68,9 @@ class MediaPlayerWithIntervalSound(
             reset()
             setDataSource("data:audio/mp3;base64,$lastAppliedAudioBase64")
             prepare()
-            setOnCompletionListener(onCompletionListener)
             setVolume(1.0f, 1.0f)
+            playbackParams = playbackParams.setSpeed(lastAppliedSettings.playbackSpeed)
+            setOnCompletionListener(onCompletionListener)
             start()
         }
     }
@@ -86,7 +87,7 @@ class MediaPlayerWithIntervalSound(
             "Interval sound offset: $offset out of ${mediaPlayer.duration}"
         )
         mediaPlayer.seekTo(offset)
-        mediaPlayer.setVolume(0.2f, 0.2f)
+        mediaPlayer.setVolume(0.3f, 0.3f)
         mediaPlayer.setOnCompletionListener(onCompletionListener)
         mediaPlayer.start()
     }
