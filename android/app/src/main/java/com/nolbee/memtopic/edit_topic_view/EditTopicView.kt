@@ -57,6 +57,7 @@ fun EditTopicViewTopAppBar(
                     )
                 },
                 actions = {
+                    TopicSelectVoiceButton(editTopicViewModel)
                     if (editTopicViewModel.isSavable) {
                         IconButton(
                             onClick = {
@@ -128,6 +129,18 @@ private fun TopicContentTextField(editTopicViewModel: EditTopicViewModel) {
         maxLines = Int.MAX_VALUE,
         label = { Text("내용") },  // TODO: replace this string with a string resource to achieve multi-language support.
     )
+}
+
+@Composable
+private fun TopicSelectVoiceButton(editTopicViewModel: EditTopicViewModel) {
+    TextButton(
+        onClick = {}
+    ) {
+        Column {
+            Text("음성 코드")
+            Text("en-US-Neural2-J")
+        }
+    }
 }
 
 @Preview(showBackground = true)
