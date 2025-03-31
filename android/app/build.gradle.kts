@@ -47,6 +47,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/DEPENDENCIES"
         }
     }
 }
@@ -86,6 +88,11 @@ dependencies {
 
     // other dependencies
     implementation("com.google.code.gson:gson:2.11.0")
+
+    // gcp dependencies
+    implementation(platform("com.google.cloud:libraries-bom:26.58.0"))
+    // https://cloud.google.com/java/docs/reference/google-cloud-texttospeech/latest/overview#gradle
+    implementation("com.google.cloud:google-cloud-texttospeech")
 
     // media style notification dependencies
     implementation("androidx.media:media:1.7.0")

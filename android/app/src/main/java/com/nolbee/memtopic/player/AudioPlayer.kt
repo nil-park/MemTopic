@@ -34,14 +34,13 @@ class AudioPlayer(
     var notificationText: String = "Sentence: 0/0, Repetition: 0/0"
 
     private suspend fun getOrSynthesizeAudioForLine(playback: Playback): String {
-        val ttsEngine = "gcp" // TODO: get from Topic if needed
         val languageCode = "en-US" // TODO: get from Topic
         val voiceType = "en-US-Neural2-J" // TODO: get from Topic
 
         val sentences = ContentParser.parseContentToSentences(playback.content)
         val sentence = sentences[playback.sentenceIndex]
 
-        val cacheKey = "${ttsEngine}_${languageCode}_${voiceType}_${sentence.hashCode()}"
+        val cacheKey = TextToSpeechGCP.makeCacheKey(languageCode, voiceType, sentence)
         val cached = audioCacheDao.getCachedAudio(cacheKey)
         if (cached != null) {
             return cached
