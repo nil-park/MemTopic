@@ -2,8 +2,6 @@ package com.nolbee.memtopic.topic_list_view
 
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
@@ -34,7 +32,6 @@ import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.database.sampleTopic00
-import com.nolbee.memtopic.player.AudioPlayerService
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,12 +91,10 @@ fun TopicListItem(
                     coroutineScope.launch {
                         try {
                             val keyValueStore = SecureKeyValueStore(context)
-                            val client = TextToSpeechGCP(
-                                keyValueStore.get("gcpTextToSpeechToken") ?: "",
-                                "en-US",
-                                "en-US-Neural2-J"
-                            )
-                            val audioBase64 = client.synthesize(topic.content)
+                            val client =
+                                TextToSpeechGCP(keyValueStore.get("gcpTextToSpeechToken") ?: "")
+                            val audioBase64 =
+                                client.synthesize(topic.content, "en-US", "en-US-Neural2-J")
                             withContext(Dispatchers.Main) {
                                 val fileData = Base64.decode(audioBase64, Base64.DEFAULT)
                                 saveFileWithMediaStore(context, topic.title, fileData)

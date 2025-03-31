@@ -47,7 +47,7 @@ class AudioPlayer(
             return cached
         } else {
             val apiKey = SecureKeyValueStore(applicationContext).get("gcpTextToSpeechToken") ?: ""
-            val audioBase64 = TextToSpeechGCP(apiKey, languageCode, voiceType).synthesize(sentence)
+            val audioBase64 = TextToSpeechGCP(apiKey).synthesize(sentence, languageCode, voiceType)
             audioCacheDao.upsertCache(AudioCache(cacheKey, audioBase64))
             return audioBase64
         }

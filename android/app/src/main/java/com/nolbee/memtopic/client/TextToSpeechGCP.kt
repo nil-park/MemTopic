@@ -72,19 +72,19 @@ private const val HOST = "https://texttospeech.googleapis.com"
 
 class TextToSpeechGCP(
     private val apiKey: String,
-    languageCode: String,
-    voiceType: String
 ) {
-
-    private var payload = TextToSpeechGCPRequest(
-        TextToSpeechGCPRequestAudioConfig(),
-        TextToSpeechGCPRequestInput("Hello World!"),
-        TextToSpeechGCPRequestVoice(languageCode, voiceType)
-    )
-
-    private suspend fun synthesize(): String {
+    suspend fun synthesize(
+        text: String,
+        languageCode: String = "en-US",
+        voiceType: String = "en-US-Neural2-J",
+    ): String {
         val response: HttpResponse
         val url = "$HOST/v1beta1/text:synthesize"
+        val payload = TextToSpeechGCPRequest(
+            TextToSpeechGCPRequestAudioConfig(),
+            TextToSpeechGCPRequestInput(text),
+            TextToSpeechGCPRequestVoice(languageCode, voiceType)
+        )
         withContext(Dispatchers.IO) {
             try {
                 HttpClient(CIO) {
@@ -109,10 +109,4 @@ class TextToSpeechGCP(
         ).audioContent
         return audioBase64
     }
-
-    suspend fun synthesize(text: String): String {
-        payload.input.text = text
-        return synthesize()
-    }
-
 }
