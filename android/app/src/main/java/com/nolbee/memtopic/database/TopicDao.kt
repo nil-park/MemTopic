@@ -20,7 +20,7 @@ data class Topic(
     val lastModified: Date = Date(),
     val lastPlayback: Date = Date(),
     val content: String = "",
-    val options: String = "{}", // JSON
+    val options: String = """{"languageCode":"en-US","voiceType":"en-US-Neural2-J"}""", // JSON
 )
 
 @Dao
