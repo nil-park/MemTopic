@@ -1,5 +1,6 @@
 package com.nolbee.memtopic.client
 
+import android.util.Log
 import com.google.api.gax.core.NoCredentialsProvider
 import com.google.api.gax.rpc.FixedHeaderProvider
 import com.google.cloud.texttospeech.v1.AudioConfig
@@ -47,7 +48,9 @@ class TextToSpeechGCP(apiKey: String) {
         return withContext(Dispatchers.IO) {
             TextToSpeechClient.create(settings).use { client ->
                 val response = client.listVoices("")
-                response.voicesList.flatMap { it.languageCodesList }.distinct()
+                val languageCodes = response.voicesList.flatMap { it.languageCodesList }.distinct()
+                Log.d("TextToSpeechGCP", "listLanguageCodes: $languageCodes")
+                languageCodes
             }
         }
     }
@@ -56,6 +59,8 @@ class TextToSpeechGCP(apiKey: String) {
         return withContext(Dispatchers.IO) {
             TextToSpeechClient.create(settings).use { client ->
                 val response = client.listVoices(languageCode)
+                val voiceCodes = response.voicesList.map { it.name }
+                Log.d("TextToSpeechGCP", "listVoices: $voiceCodes")
                 response.voicesList
             }
         }

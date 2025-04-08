@@ -97,6 +97,10 @@ fun EditTopicViewTopAppBar(
             navController.navigateUp()
         }
     )
+
+    if (editTopicViewModel.openBottomSheet) {
+        EditTopicSettingsViewGCP(vm = editTopicViewModel)
+    }
 }
 
 @Composable
@@ -123,13 +127,15 @@ private fun TopicContentTextField(editTopicViewModel: EditTopicViewModel) {
 }
 
 @Composable
-private fun TopicSelectVoiceButton(editTopicViewModel: EditTopicViewModel) {
+private fun TopicSelectVoiceButton(vm: EditTopicViewModel) {
     TextButton(
-        onClick = {}
+        onClick = {
+            vm.openBottomSheet = true
+        }
     ) {
         Column {
             Text("음성 코드")
-            Text("en-US-Neural2-J")
+            Text(vm.selectedVoiceCode)
         }
     }
 }

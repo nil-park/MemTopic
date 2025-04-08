@@ -1,10 +1,15 @@
 package com.nolbee.memtopic.edit_topic_view
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nolbee.memtopic.account_view.SecureKeyValueStore
+import com.nolbee.memtopic.client.TextToSpeechGCP
 import com.nolbee.memtopic.database.Topic
+import kotlinx.coroutines.launch
 import java.util.Date
 
 class EditTopicViewModel : ViewModel() {
@@ -43,4 +48,26 @@ class EditTopicViewModel : ViewModel() {
     }
 
     var isConfirmDialogOpen by mutableStateOf(false)
+
+    var openBottomSheet by mutableStateOf(false)
+    var selectedLanguageCode by mutableStateOf("en-US")
+    var selectedVoiceCode by mutableStateOf("en-US-Neural2-J")
+    var languageCodes by mutableStateOf(listOf<String>())
+    var voiceCodes by mutableStateOf(listOf<String>())
+
+    fun loadLanguageCodes(context: Context) {
+        viewModelScope.launch {
+            val apiKey = SecureKeyValueStore(context).get("gcpTextToSpeechToken") ?: ""
+            val client = TextToSpeechGCP(apiKey)
+            languageCodes = client.listLanguageCodes()
+        }
+    }
+
+    fun loadVoiceCodes(context: Context) {
+        viewModelScope.launch {
+            val apiKey = SecureKeyValueStore(context).get("gcpTextToSpeechToken") ?: ""
+            val client = TextToSpeechGCP(apiKey)
+            voiceCodes = client.listVoices(selectedLanguageCode).map { it.name }
+        }
+    }
 }
