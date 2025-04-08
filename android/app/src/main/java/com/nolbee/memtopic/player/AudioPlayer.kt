@@ -18,6 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 class AudioPlayer(
     private val playbackDao: PlaybackDao,
@@ -34,8 +35,17 @@ class AudioPlayer(
     var notificationText: String = "Sentence: 0/0, Repetition: 0/0"
 
     private suspend fun getOrSynthesizeAudioForLine(playback: Playback): String {
-        val languageCode = "en-US" // TODO: get from Topic
-        val voiceType = "en-US-Neural2-J" // TODO: get from Topic
+        val topic = topicDao.getTopic(playback.topicId)
+        if (topic == null) {
+            val msg = "Topic not found for ID: ${playback.topicId}"
+            Log.e("AudioPlayer", msg)
+            notificationTitle = "Error"
+            notificationText = msg
+            throw Exception(msg)
+        }
+        val jsonObject = JSONObject(topic.options)
+        val languageCode = jsonObject.optString("languageCode", "en-US")
+        val voiceType = jsonObject.optString("voiceType", "en-US-Neural2-J")
 
         val sentences = ContentParser.parseContentToSentences(playback.content)
         val sentence = sentences[playback.sentenceIndex]

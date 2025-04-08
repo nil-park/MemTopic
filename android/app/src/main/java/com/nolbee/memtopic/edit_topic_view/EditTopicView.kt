@@ -90,6 +90,7 @@ fun EditTopicViewTopAppBar(
                     id = editTopicViewModel.topicRef.id,
                     title = editTopicViewModel.topicTitle,
                     content = editTopicViewModel.topicContent,
+                    options = editTopicViewModel.encodeVoiceOptionsToJson(),
                     lastModified = Date(),
                     lastPlayback = editTopicViewModel.topicRef.lastPlayback,
                 )

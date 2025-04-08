@@ -10,6 +10,7 @@ import com.nolbee.memtopic.account_view.SecureKeyValueStore
 import com.nolbee.memtopic.client.TextToSpeechGCP
 import com.nolbee.memtopic.database.Topic
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.Date
 
 class EditTopicViewModel : ViewModel() {
@@ -30,22 +31,29 @@ class EditTopicViewModel : ViewModel() {
 
     fun updateTitle(newTitle: String) {
         topicTitle = newTitle
-        val voiceOptions = encodeVoiceOptionsToJson(selectedLanguageCode, selectedVoiceType)
-        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
-        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
+        val voiceOptions = encodeVoiceOptionsToJson()
+        val isModified =
+            (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
+        isSavable =
+            isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
     }
 
     fun updateContent(newContent: String) {
         topicContent = newContent
-        val voiceOptions = encodeVoiceOptionsToJson(selectedLanguageCode, selectedVoiceType)
-        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
-        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
+        val voiceOptions = encodeVoiceOptionsToJson()
+        val isModified =
+            (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
+        isSavable =
+            isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
     }
 
     fun setTopicReference(topic: Topic) {
         topicTitle = topic.title
         topicContent = topic.content
         topicRef = topic
+        val voiceOptions = JSONObject(topic.options)
+        selectedLanguageCode = voiceOptions.optString("languageCode", "en-US")
+        selectedVoiceType = voiceOptions.optString("voiceType", "en-US-Neural2-J")
         isNew = topic.id == 0
     }
 
@@ -60,9 +68,11 @@ class EditTopicViewModel : ViewModel() {
     fun updateVoiceType(languageCode: String, voiceType: String) {
         selectedLanguageCode = languageCode
         selectedVoiceType = voiceType
-        val voiceOptions = encodeVoiceOptionsToJson(selectedLanguageCode, selectedVoiceType)
-        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
-        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
+        val voiceOptions = encodeVoiceOptionsToJson()
+        val isModified =
+            (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
+        isSavable =
+            isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
     }
 
     fun loadLanguageCodes(context: Context) {
@@ -80,8 +90,9 @@ class EditTopicViewModel : ViewModel() {
             voiceTypes = client.listVoices(selectedLanguageCode).map { it.name }
         }
     }
+
+    fun encodeVoiceOptionsToJson(): String {
+        return """{"languageCode":"$selectedLanguageCode","voiceType":"$selectedVoiceType"}"""
+    }
 }
 
-private fun encodeVoiceOptionsToJson(languageCode: String, voiceType: String): String {
-    return """{"languageCode":"$languageCode","voiceType":"$voiceType"}"""
-}
