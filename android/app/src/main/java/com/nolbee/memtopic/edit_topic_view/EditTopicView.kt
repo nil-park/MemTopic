@@ -2,29 +2,20 @@ package com.nolbee.memtopic.edit_topic_view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -151,60 +142,6 @@ private fun EditTopicPreview() {
             navController = rememberNavController(),
             topicViewModel = MockTopicViewModel(),
             editTopicViewModel = EditTopicViewModel()
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ConfirmView(
-    content: String,
-    vm: EditTopicViewModel,
-    onConfirm: () -> Unit,
-) {
-    if (vm.isConfirmDialogOpen) {
-        BasicAlertDialog(
-            onDismissRequest = {
-                vm.isConfirmDialogOpen = false
-            }
-        ) {
-            Surface(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight(),
-                shape = MaterialTheme.shapes.large,
-                tonalElevation = AlertDialogDefaults.TonalElevation
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = content,
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    TextButton(
-                        onClick = {
-                            onConfirm()
-                            vm.isConfirmDialogOpen = false
-                        },
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text("Confirm")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ConfirmViewPreview() {
-    MemTopicTheme {
-        val vm = EditTopicViewModel()
-        vm.isConfirmDialogOpen = true
-        ConfirmView(
-            content = "Do you really want to do so?",
-            vm = vm,
-            onConfirm = {}
         )
     }
 }
