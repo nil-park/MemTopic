@@ -30,14 +30,16 @@ class EditTopicViewModel : ViewModel() {
 
     fun updateTitle(newTitle: String) {
         topicTitle = newTitle
-        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content)
-        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != ""
+        val voiceOptions = encodeVoiceOptionsToJson(selectedLanguageCode, selectedVoiceType)
+        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
+        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
     }
 
     fun updateContent(newContent: String) {
         topicContent = newContent
-        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content)
-        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != ""
+        val voiceOptions = encodeVoiceOptionsToJson(selectedLanguageCode, selectedVoiceType)
+        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
+        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
     }
 
     fun setTopicReference(topic: Topic) {
@@ -51,9 +53,17 @@ class EditTopicViewModel : ViewModel() {
 
     var openBottomSheet by mutableStateOf(false)
     var selectedLanguageCode by mutableStateOf("en-US")
-    var selectedVoiceCode by mutableStateOf("en-US-Neural2-J")
+    var selectedVoiceType by mutableStateOf("en-US-Neural2-J")
     var languageCodes by mutableStateOf(listOf<String>())
-    var voiceCodes by mutableStateOf(listOf<String>())
+    var voiceTypes by mutableStateOf(listOf<String>())
+
+    fun updateVoiceType(languageCode: String, voiceType: String) {
+        selectedLanguageCode = languageCode
+        selectedVoiceType = voiceType
+        val voiceOptions = encodeVoiceOptionsToJson(selectedLanguageCode, selectedVoiceType)
+        val isModified = (topicTitle != topicRef.title) || (topicContent != topicRef.content) || (voiceOptions != topicRef.options)
+        isSavable = isModified && topicTitle.trim() != "" && topicContent.trim() != "" && selectedVoiceType != ""
+    }
 
     fun loadLanguageCodes(context: Context) {
         viewModelScope.launch {
@@ -67,7 +77,11 @@ class EditTopicViewModel : ViewModel() {
         viewModelScope.launch {
             val apiKey = SecureKeyValueStore(context).get("gcpTextToSpeechToken") ?: ""
             val client = TextToSpeechGCP(apiKey)
-            voiceCodes = client.listVoices(selectedLanguageCode).map { it.name }
+            voiceTypes = client.listVoices(selectedLanguageCode).map { it.name }
         }
     }
+}
+
+private fun encodeVoiceOptionsToJson(languageCode: String, voiceType: String): String {
+    return """{"languageCode":"$languageCode","voiceType":"$voiceType"}"""
 }

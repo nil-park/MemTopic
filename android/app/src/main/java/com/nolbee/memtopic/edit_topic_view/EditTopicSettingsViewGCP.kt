@@ -91,8 +91,7 @@ fun EditTopicSettingsViewGCP(vm: EditTopicViewModel) {
                                     selected = (langCode == vm.selectedLanguageCode),
                                     onClick = {
                                         if (langCode != vm.selectedLanguageCode) {
-                                            vm.selectedLanguageCode = langCode
-                                            vm.selectedVoiceCode = ""
+                                            vm.updateVoiceType(langCode, "")
                                             vm.loadVoiceCodes(context)
                                             expandLanguageCodes = false
                                             expandVoiceCodes = true
@@ -128,7 +127,7 @@ fun EditTopicSettingsViewGCP(vm: EditTopicViewModel) {
                         }
                         vm.loadVoiceCodes(context)
                     },
-                ) { Text(text = vm.selectedVoiceCode) }
+                ) { Text(text = vm.selectedVoiceType) }
             }
             if (expandVoiceCodes) {
                 Box(
@@ -144,16 +143,16 @@ fun EditTopicSettingsViewGCP(vm: EditTopicViewModel) {
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        vm.voiceCodes.forEach { voiceCode ->
+                        vm.voiceTypes.forEach { voiceCode ->
                             Box(modifier = Modifier.padding(end = 8.dp)) {
                                 FilterChip(
-                                    selected = (voiceCode == vm.selectedVoiceCode),
+                                    selected = (voiceCode == vm.selectedVoiceType),
                                     onClick = {
-                                        vm.selectedVoiceCode = voiceCode
+                                        vm.updateVoiceType(vm.selectedLanguageCode, voiceCode)
                                         expandVoiceCodes = false
                                     },
                                     label = { Text(voiceCode) },
-                                    leadingIcon = if (voiceCode == vm.selectedVoiceCode) {
+                                    leadingIcon = if (voiceCode == vm.selectedVoiceType) {
                                         {
                                             Icon(
                                                 imageVector = Icons.Filled.Done,

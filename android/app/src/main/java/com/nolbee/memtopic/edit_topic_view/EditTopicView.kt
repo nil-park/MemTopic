@@ -135,7 +135,7 @@ private fun TopicSelectVoiceButton(vm: EditTopicViewModel) {
     ) {
         Column {
             Text("음성 코드")
-            Text(vm.selectedVoiceCode)
+            Text(vm.selectedVoiceType)
         }
     }
 }
