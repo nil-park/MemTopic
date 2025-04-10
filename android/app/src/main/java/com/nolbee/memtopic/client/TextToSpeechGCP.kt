@@ -1,118 +1,74 @@
 package com.nolbee.memtopic.client
 
-import com.google.gson.Gson
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
+import android.util.Log
+import com.google.api.gax.core.NoCredentialsProvider
+import com.google.api.gax.rpc.FixedHeaderProvider
+import com.google.cloud.texttospeech.v1.AudioConfig
+import com.google.cloud.texttospeech.v1.AudioEncoding
+import com.google.cloud.texttospeech.v1.SynthesisInput
+import com.google.cloud.texttospeech.v1.TextToSpeechClient
+import com.google.cloud.texttospeech.v1.TextToSpeechSettings
+import com.google.cloud.texttospeech.v1.Voice
+import com.google.cloud.texttospeech.v1.VoiceSelectionParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Base64
 
-private data class TextToSpeechGCPAudioConfig(
-    var audioEncoding: String = "MP3", // LINEAR16, MP3, MP3_64_KBPS, OGG_OPUS, MULAW, ALAW
-    var speakingRate: Double = 1.0, // [0.25, 4.0]
-    var pitch: Double = 0.0, // [-20.0, 20.0]
-    var volumeGainDb: Double = 0.0, // [-96.0, 16.0]
-    var sampleRateHertz: Int,
-    var effectsProfileId: List<String>
-)
+class TextToSpeechGCP(apiKey: String) {
+    private val settings: TextToSpeechSettings = TextToSpeechSettings.newBuilder()
+        .setCredentialsProvider(NoCredentialsProvider.create())
+        .setHeaderProvider(FixedHeaderProvider.create("X-Goog-Api-Key", apiKey))
+        .setTransportChannelProvider(
+            TextToSpeechSettings.defaultHttpJsonTransportProviderBuilder().build()
+        )
+        .build()
 
-private data class TextToSpeechGCPRequestAudioConfig(
-    var audioEncoding: String = "MP3",
-    var pitch: Double = 0.0,
-    var speakingRate: Double = 1.0
-)
-
-private data class TextToSpeechGCPRequestVoice(
-    var languageCode: String,
-    var name: String
-)
-
-private data class TextToSpeechGCPRequestInput(
-    var text: String
-)
-
-private data class TextToSpeechGCPRequest(
-    var audioConfig: TextToSpeechGCPRequestAudioConfig,
-    var input: TextToSpeechGCPRequestInput,
-    var voice: TextToSpeechGCPRequestVoice
-)
-
-private data class TextToSpeechGCPResponseTimePoint(
-    var markName: String,
-    var timeSeconds: Double
-)
-
-private data class TextToSpeechGCPResponse(
-    var audioContent: String,
-    var timepoints: List<TextToSpeechGCPResponseTimePoint>,
-    var audioConfig: TextToSpeechGCPAudioConfig
-)
-
-private suspend fun extractErrorMessage(res: HttpResponse) {
-    if (res.status.value != 200) {
-        val body = res.bodyAsText()
-        var msg = "(${res.status}): $body"
-        throw java.lang.Exception(msg)
-//        try {
-//            msg = Gson().fromJson(body, RemoteResError::class.java).msg
-//        } finally {
-//            throw java.lang.Exception(msg)
-//        }
-    }
-}
-
-private const val HOST = "https://texttospeech.googleapis.com"
-
-class TextToSpeechGCP(
-    private val apiKey: String,
-    languageCode: String,
-    voiceType: String
-) {
-
-    private var payload = TextToSpeechGCPRequest(
-        TextToSpeechGCPRequestAudioConfig(),
-        TextToSpeechGCPRequestInput("Hello World!"),
-        TextToSpeechGCPRequestVoice(languageCode, voiceType)
-    )
-
-    private suspend fun synthesize(): String {
-        val response: HttpResponse
-        val url = "$HOST/v1beta1/text:synthesize"
-        withContext(Dispatchers.IO) {
-            try {
-                HttpClient(CIO) {
-                    install(HttpTimeout) {
-                        requestTimeoutMillis = 15000 // TODO: request timeout from configuration
-                    }
-                }.use { client ->
-                    response = client.post(url) {
-                        header("X-goog-api-key", apiKey)
-                        contentType(ContentType.Application.Json)
-                        setBody(Gson().toJson(payload))
-                    }
-                }
-            } catch (e: Exception) {
-                throw e
+    suspend fun synthesize(
+        text: String,
+        languageCode: String = "en-US",
+        voiceType: String = "en-US-Neural2-J"
+    ): String {
+        return withContext(Dispatchers.IO) {
+            TextToSpeechClient.create(settings).use { client ->
+                val input = SynthesisInput.newBuilder().setText(text).build()
+                val voice = VoiceSelectionParams.newBuilder()
+                    .setLanguageCode(languageCode)
+                    .setName(voiceType)
+                    .build()
+                val audioConfig = AudioConfig.newBuilder()
+                    .setAudioEncoding(AudioEncoding.MP3)
+                    .build()
+                val response = client.synthesizeSpeech(input, voice, audioConfig)
+                Base64.getEncoder().encodeToString(response.audioContent.toByteArray())
             }
         }
-        extractErrorMessage(response)
-        val audioBase64 = Gson().fromJson(
-            response.bodyAsText(),
-            TextToSpeechGCPResponse::class.java
-        ).audioContent
-        return audioBase64
     }
 
-    suspend fun synthesize(text: String): String {
-        payload.input.text = text
-        return synthesize()
+    suspend fun listLanguageCodes(): List<String> {
+        return withContext(Dispatchers.IO) {
+            TextToSpeechClient.create(settings).use { client ->
+                val response = client.listVoices("")
+                val languageCodes = response.voicesList.flatMap { it.languageCodesList }.distinct()
+                Log.d("TextToSpeechGCP", "listLanguageCodes: $languageCodes")
+                languageCodes
+            }
+        }
     }
 
+    suspend fun listVoices(languageCode: String): List<Voice> {
+        return withContext(Dispatchers.IO) {
+            TextToSpeechClient.create(settings).use { client ->
+                val response = client.listVoices(languageCode)
+                val voiceCodes = response.voicesList.map { it.name }
+                Log.d("TextToSpeechGCP", "listVoices: $voiceCodes")
+                response.voicesList
+            }
+        }
+    }
+
+    companion object {
+        fun makeCacheKey(languageCode: String, voiceType: String, sentence: String): String {
+            return "gcp_${languageCode}_${voiceType}_${sentence.hashCode()}"
+        }
+    }
 }

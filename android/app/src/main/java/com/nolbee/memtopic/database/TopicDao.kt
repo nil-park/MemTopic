@@ -20,6 +20,7 @@ data class Topic(
     val lastModified: Date = Date(),
     val lastPlayback: Date = Date(),
     val content: String = "",
+    val options: String = """{"languageCode":"en-US","voiceType":"en-US-Neural2-J"}""", // JSON
 )
 
 @Dao
@@ -60,7 +61,8 @@ val sampleTopic00 = Topic(
         from right to left, as illustrated in Figure 2.1.
         At all times, the cards held in the left hand are sorted,
         and these cards were originally the top cards of the pile on the table.
-    """.trimIndent()
+    """.trimIndent(),
+    options = "{}",
 )
 
 val sampleTopic01 = Topic(
@@ -74,7 +76,8 @@ val sampleTopic01 = Topic(
         Next, we divide and rearrange those rectangles to fill a rectangular target completely.
         Each column in the target has a fixed width and contains rectangles from at most two different sides of the loaded die.
         Finally, we simulate die rolls by randomly throwing darts at the target, which we can achieve by using a combination of a fair die and a biased coin flip.
-    """.trimIndent()
+    """.trimIndent(),
+    options = "{}",
 )
 
 val sampleTopic02 = Topic(
@@ -97,5 +100,6 @@ val sampleTopic02 = Topic(
         Hybrid clouds combine public and private cloud models,
         allowing companies to leverage public cloud services
         and maintain the security and compliance capabilities commonly found in private cloud architectures.
-    """.trimIndent()
+    """.trimIndent(),
+    options = "{}",
 )

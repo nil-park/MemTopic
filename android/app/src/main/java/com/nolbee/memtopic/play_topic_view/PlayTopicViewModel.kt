@@ -58,7 +58,12 @@ class PlayTopicViewModel @Inject constructor(
         }
         viewModelScope.launch {
             playableLines
-                .flatMapLatest { lines -> audioCacheRepository.getIsCachedLines(lines) }
+                .flatMapLatest { lines ->
+                    audioCacheRepository.getIsCachedLines(
+                        lines,
+                        topicToPlay.options
+                    )
+                }
                 .collect { list ->
                     isCachedLines.value = list
                     Log.d("PlayTopicViewModel", "isCachedLines: $list")

@@ -32,7 +32,7 @@ class Converters {
         AudioCache::class,
         SettingEntity::class,
     ],
-    version = 4
+    version = 5
 )
 @TypeConverters(
     Converters::class
@@ -52,6 +52,7 @@ object TopicDatabaseModule {
     fun provideDatabase(app: Application): TopicDatabase {
         return Room.databaseBuilder(app, TopicDatabase::class.java, "topicDatabase")
             .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
             .build()
     }
 

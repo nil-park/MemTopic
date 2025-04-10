@@ -6,11 +6,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Base64
 
+
 class TextToSpeechGCPTest {
     @Test
     fun `test TTS client`() = runBlocking {
-        val apiKey = System.getenv("GCP_TTS_API_KEY") ?: ""
-        val client = TextToSpeechGCP(apiKey, "en-US", "en-US-Neural2-J")
+        val apiKey = System.getenv("GCP_TTS_API_KEY") ?: error("No credentials found")
+        val client = TextToSpeechGCP(apiKey)
         val audioBase64 = client.synthesize("Hello World!")
         // println("Base64 String: $audioBase64")
 
@@ -29,5 +30,23 @@ class TextToSpeechGCPTest {
         } catch (e: IllegalArgumentException) {
             assertTrue("Audio Base64 string should be decodable", false)
         }
+    }
+
+    @Test
+    fun `list language codes`(): Unit = runBlocking {
+        val apiKey = System.getenv("GCP_TTS_API_KEY") ?: error("No credentials found")
+        val client = TextToSpeechGCP(apiKey)
+        val languageCodes = client.listLanguageCodes()
+        println("Language Codes: $languageCodes")
+        assertTrue("Voices should not be empty", "en-US" in languageCodes)
+    }
+
+    @Test
+    fun `list TTS voices`(): Unit = runBlocking {
+        val apiKey = System.getenv("GCP_TTS_API_KEY") ?: error("No credentials found")
+        val client = TextToSpeechGCP(apiKey)
+        val voices = client.listVoices("ko-KR").map { it.name }
+        println("Voices: $voices")
+        assertTrue("Voices should not be empty", voices.isNotEmpty())
     }
 }
