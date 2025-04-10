@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -34,6 +35,9 @@ fun PlayTopicViewTopAppBar(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
+                actions = {
+                    PlayerSettingsButton(vm)
+                }
             )
         },
         content = { innerPadding ->
@@ -47,6 +51,10 @@ fun PlayTopicViewTopAppBar(
             }
         }
     )
+
+    if (vm.openBottomSheet) {
+        PlayerSettingsView(playTopicViewModel = vm)
+    }
 }
 
 
@@ -59,5 +67,16 @@ fun PlayTopicViewTopAppBarPreview() {
         PlayTopicViewTopAppBar(
             vm = vm
         )
+    }
+}
+
+@Composable
+private fun PlayerSettingsButton(vm: IPlayTopicViewModel) {
+    TextButton(
+        onClick = {
+            vm.openBottomSheet = true
+        }
+    ) {
+        Text("재생 설정")
     }
 }

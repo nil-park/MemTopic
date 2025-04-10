@@ -22,6 +22,7 @@ interface IPlayTopicViewModel {
     val playableLines: MutableStateFlow<List<String>>
     val isCachedLines: MutableStateFlow<List<Boolean>>
     val currentLineIndex: MutableStateFlow<Int>
+    var openBottomSheet: Boolean
     fun setTopic(topic: Topic)
     fun setCurrentLine(index: Int)
 }
@@ -43,6 +44,8 @@ class PlayTopicViewModel @Inject constructor(
 
     override var currentLineIndex = MutableStateFlow(-1)
         private set
+
+    override var openBottomSheet by mutableStateOf(false)
 
     init {
         viewModelScope.launch {
@@ -99,6 +102,8 @@ class MockPlayTopicViewModel : ViewModel(), IPlayTopicViewModel {
 
     override var currentLineIndex = MutableStateFlow(0)
         private set
+
+    override var openBottomSheet by mutableStateOf(false)
 
     override fun setTopic(topic: Topic) {
         this.topicToPlay = topic
