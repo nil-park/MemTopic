@@ -10,6 +10,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SheetValue.Expanded
 import androidx.compose.material3.SheetValue.Hidden
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
@@ -30,7 +31,10 @@ fun PlayerSettingsView(
     settingsViewModel: IPlayerSettingsViewModel = hiltViewModel<PlayerSettingsViewModel>()
 ) {
     val bottomSheetState = rememberSheetState(
-        initialValue = SheetValue.PartiallyExpanded
+        skipPartiallyExpanded = true,
+        initialValue = if (settingsViewModel is MockPlayerSettingsViewModel) {
+            Expanded
+        } else Hidden
     )
     ModalBottomSheet(
         onDismissRequest = { playTopicViewModel.openBottomSheet = false },
@@ -39,7 +43,12 @@ fun PlayerSettingsView(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(15.dp),
+                .padding(
+                    start = 15.dp,
+                    top = 15.dp,
+                    end = 15.dp,
+                    bottom = 100.dp,
+                ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (!settingsViewModel.isInitialized) {
@@ -122,7 +131,6 @@ private fun rememberSheetState(
     initialValue: SheetValue = Hidden,
     skipHiddenState: Boolean = false,
 ): SheetState {
-
     val density = LocalDensity.current
     return rememberSaveable(
         skipPartiallyExpanded, confirmValueChange,
