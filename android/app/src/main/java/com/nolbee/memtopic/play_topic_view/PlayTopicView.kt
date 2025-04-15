@@ -35,7 +35,7 @@ fun PlayTopicViewTopAppBar(
                             fontSize = 14.sp
                         )
                         Text(
-                            text = vm.topicToPlay.title,
+                            text = vm.topicToView.title,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

@@ -197,7 +197,7 @@ private fun startAudioService(
 ) {
     val intent = Intent(context, AudioPlayerService::class.java).apply {
         action = AudioPlayerService.ACTION_UPDATE
-        putExtra(AudioPlayerService.KEY_TOPIC_ID, vm.topicToPlay.id)
+        putExtra(AudioPlayerService.KEY_TOPIC_ID, vm.topicToView.id)
         putExtra(AudioPlayerService.KEY_SENTENCE_ID, index)
     }
     context.startForegroundService(intent)
