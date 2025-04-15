@@ -51,7 +51,7 @@ class PlayTopicViewModel @Inject constructor(
         viewModelScope.launch {
             playbackRepository.getPlayback().collect { playback ->
                 playback?.let { p ->
-                    if (p.topicId != topicToPlay.id)
+                    if (p.topicId != topicToPlay.id || !p.isPlaying)
                         currentLineIndex.value = -1
                     else
                         currentLineIndex.value = p.sentenceIndex
