@@ -91,7 +91,6 @@ fun TopicListTopAppBar(
         vm = topicViewModel,
         onConfirm = {
             topicViewModel.deleteTopic()
-            navController.navigateUp()
         },
         onDismiss = {
             topicViewModel.topicToDelete = Topic()
