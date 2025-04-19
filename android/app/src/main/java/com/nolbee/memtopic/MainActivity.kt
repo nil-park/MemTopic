@@ -24,7 +24,6 @@ import com.nolbee.memtopic.account_view.AccountViewTopAppBar
 import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.database.PlaybackRepository
-import com.nolbee.memtopic.database.Topic
 import com.nolbee.memtopic.database.TopicRepository
 import com.nolbee.memtopic.database.TopicViewModel
 import com.nolbee.memtopic.edit_topic_view.EditTopicViewModel
@@ -69,14 +68,13 @@ fun MainView(
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var startDestination by remember { mutableStateOf<String?>(null) }
-    var recentlyPlayedTopic by remember { mutableStateOf(Topic()) }
 
     LaunchedEffect(Unit) {
         val playback = playbackRepository?.getPlaybackOnce()
         if (playback != null && playback.topicId != 0) {
             topicRepository?.getTopic(playback.topicId)?.let { topic ->
-                recentlyPlayedTopic = topic
-                startDestination = "PlayTopicView2"
+                topicViewModel.topicToPlay = topic
+                startDestination = "PlayTopicView"
                 return@LaunchedEffect
             }
         }
@@ -132,20 +130,6 @@ fun MainView(
                             hiltViewModel<PlayTopicViewModel>()
                         LaunchedEffect(Unit) {
                             playTopicViewModel.setTopic(topicViewModel.topicToPlay)
-                        }
-                        PlayTopicViewTopAppBar(
-                            vm = playTopicViewModel,
-                        )
-                    }
-                    composable(
-                        "PlayTopicView2",
-                        enterTransition = { EnterTransition.None },
-                        exitTransition = { ExitTransition.None }
-                    ) {
-                        val playTopicViewModel: IPlayTopicViewModel =
-                            hiltViewModel<PlayTopicViewModel>()
-                        LaunchedEffect(Unit) {
-                            playTopicViewModel.setTopic(recentlyPlayedTopic)
                         }
                         PlayTopicViewTopAppBar(
                             vm = playTopicViewModel,
