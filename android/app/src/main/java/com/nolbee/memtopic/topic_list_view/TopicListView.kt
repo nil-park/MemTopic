@@ -60,9 +60,12 @@ fun TopicListTopAppBar(
                     )
                 },
                 actions = {
+                    val defaultLanguageCode = stringResource(R.string.default_gcp_language_code)
+                    val defaultVoiceType = stringResource(R.string.default_gcp_voice_name)
                     IconButton(onClick = {
                         topicViewModel.topicToEdit = Topic(
-                            title = "", content = "", lastModified = Date(), lastPlayback = Date()
+                            title = "", content = "", lastModified = Date(), lastPlayback = Date(),
+                            options = """{"languageCode":"$defaultLanguageCode","voiceType":"$defaultVoiceType"}""",
                         )
                         navController.navigate("EditTopicView")
                     }) {

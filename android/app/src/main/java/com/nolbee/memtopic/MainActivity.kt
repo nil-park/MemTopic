@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -111,7 +110,7 @@ fun MainView(
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None }
                     ) {
-                        val editTopicViewModel: EditTopicViewModel = viewModel()
+                        val editTopicViewModel = hiltViewModel<EditTopicViewModel>()
                         LaunchedEffect(Unit) {
                             editTopicViewModel.setTopicReference(topicViewModel.topicToEdit)
                         }

@@ -17,6 +17,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -148,7 +149,7 @@ private fun EditTopicPreview() {
         EditTopicViewTopAppBar(
             navController = rememberNavController(),
             topicViewModel = MockTopicViewModel(),
-            editTopicViewModel = EditTopicViewModel()
+            editTopicViewModel = EditTopicViewModel(LocalContext.current)
         )
     }
 }
