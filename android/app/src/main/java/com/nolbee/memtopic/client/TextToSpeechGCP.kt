@@ -25,8 +25,8 @@ class TextToSpeechGCP(apiKey: String) {
 
     suspend fun synthesize(
         text: String,
-        languageCode: String = "en-US",
-        voiceType: String = "en-US-Neural2-J"
+        languageCode: String,
+        voiceType: String,
     ): String {
         return withContext(Dispatchers.IO) {
             TextToSpeechClient.create(settings).use { client ->

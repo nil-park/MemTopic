@@ -22,6 +22,25 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
             ADD COLUMN `options` TEXT NOT NULL 
             DEFAULT '{"languageCode":"en-US","voiceType":"en-US-Neural2-J"}'
             """
+        ) // TODO: default languageCode, voiceType from R.string
+    }
+}
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS Playback")
+        db.execSQL(
+            """
+            CREATE TABLE Playback (
+                id INTEGER NOT NULL,
+                topicId INTEGER NOT NULL,
+                sentenceIndex INTEGER NOT NULL,
+                currentRepetition INTEGER NOT NULL,
+                totalRepetitions INTEGER NOT NULL,
+                isPlaying INTEGER NOT NULL,
+                content TEXT NOT NULL,
+                PRIMARY KEY(id)
+            )
+            """
         )
     }
 }

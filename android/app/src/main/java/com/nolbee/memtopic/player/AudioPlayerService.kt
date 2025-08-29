@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
+import com.nolbee.memtopic.MainActivity
 import com.nolbee.memtopic.database.AudioCacheDao
 import com.nolbee.memtopic.database.PlaybackDao
 import com.nolbee.memtopic.database.SettingsDao
@@ -91,6 +92,16 @@ class AudioPlayerService : Service() {
     }
 
     private fun buildNotification(): Notification {
+        val mainIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            // TODO: putExtra(KEY_TOPIC_ID, ...)
+            // TODO: putExtra("navTarget", "PlayTopicView")
+        }
+        val contentPendingIntent = PendingIntent.getActivity(
+            this, 0, mainIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val exitIntent = Intent(this, AudioPlayerService::class.java).apply { action = ACTION_EXIT }
         val exitPendingIntent = PendingIntent.getService(
             this, 0, exitIntent,
@@ -107,6 +118,7 @@ class AudioPlayerService : Service() {
             .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
             .setContentTitle(audioPlayer.notificationTitle)
             .setContentText(audioPlayer.notificationText)
+            .setContentIntent(contentPendingIntent)
             .setStyle(MediaStyle().setShowActionsInCompactView(0))
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

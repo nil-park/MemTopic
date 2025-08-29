@@ -37,7 +37,14 @@ class AccountViewModel @Inject constructor(
     }
 
     private fun loadGcpTextToSpeechToken(): String {
-        return secureStore?.get("gcpTextToSpeechToken") ?: ""
+        try {
+            secureStore?.get("gcpTextToSpeechToken")?.let {
+                return it
+            }
+        } catch (e: Exception) {
+            secureStore?.set("gcpTextToSpeechToken", "")
+        }
+        return ""
     }
 }
 

@@ -16,6 +16,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
@@ -64,8 +65,9 @@ fun ConfirmView(
 @Composable
 private fun ConfirmViewPreview() {
     MemTopicTheme {
-        val vm = EditTopicViewModel()
-        vm.isConfirmDialogOpen = true
+        val vm = EditTopicViewModel(LocalContext.current).apply {
+            isConfirmDialogOpen = true
+        }
         ConfirmView(
             content = "Do you really want to do so?",
             vm = vm,

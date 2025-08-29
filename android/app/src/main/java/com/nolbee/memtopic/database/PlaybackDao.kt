@@ -21,9 +21,8 @@ data class Playback(
     val sentenceIndex: Int,          // The index of the current sentence
     val currentRepetition: Int,      // How many times the current sentence has been played
     val totalRepetitions: Int,       // How many times the current sentence should be repeated
-    val isInterval: Boolean = false, // Whether the current section is the interval
+    val isPlaying: Boolean = false,  // Whether the audio player is playing
     val content: String = "",
-    // TODO: is playing
 ) {
     fun next(newTotalRepetitions: Int): Playback {
         return if (currentRepetition < newTotalRepetitions - 1) {

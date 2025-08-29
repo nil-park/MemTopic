@@ -1,19 +1,31 @@
 package com.nolbee.memtopic.edit_topic_view
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nolbee.memtopic.R
 import com.nolbee.memtopic.account_view.SecureKeyValueStore
 import com.nolbee.memtopic.client.TextToSpeechGCP
 import com.nolbee.memtopic.database.Topic
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.util.Date
+import javax.inject.Inject
 
-class EditTopicViewModel : ViewModel() {
+@HiltViewModel
+class EditTopicViewModel @Inject constructor(
+    @ApplicationContext private val context: Context
+) : ViewModel() {
+
+    private val defaultLanguageCode = context.getString(R.string.default_gcp_language_code)
+    private val defaultVoiceType = context.getString(R.string.default_gcp_voice_name)
+
     var topicRef: Topic by mutableStateOf(
         Topic(title = "", content = "", lastModified = Date(), lastPlayback = Date())
     )
@@ -52,16 +64,17 @@ class EditTopicViewModel : ViewModel() {
         topicContent = topic.content
         topicRef = topic
         val voiceOptions = JSONObject(topic.options)
-        selectedLanguageCode = voiceOptions.optString("languageCode", "en-US")
-        selectedVoiceType = voiceOptions.optString("voiceType", "en-US-Neural2-J")
+        selectedLanguageCode = voiceOptions.optString("languageCode", defaultLanguageCode)
+        selectedVoiceType = voiceOptions.optString("voiceType", defaultLanguageCode)
+        Log.d("EditTopicViewModel", "setTopicReference: $topic")
         isNew = topic.id == 0
     }
 
     var isConfirmDialogOpen by mutableStateOf(false)
 
     var openBottomSheet by mutableStateOf(false)
-    var selectedLanguageCode by mutableStateOf("en-US")
-    var selectedVoiceType by mutableStateOf("en-US-Neural2-J")
+    var selectedLanguageCode by mutableStateOf(defaultLanguageCode)
+    var selectedVoiceType by mutableStateOf(defaultVoiceType)
     var languageCodes by mutableStateOf(listOf<String>())
     var voiceTypes by mutableStateOf(listOf<String>())
 
@@ -93,6 +106,6 @@ class EditTopicViewModel : ViewModel() {
 
     fun encodeVoiceOptionsToJson(): String {
         return """{"languageCode":"$selectedLanguageCode","voiceType":"$selectedVoiceType"}"""
-    }
+    } // TODO: remove redunant code (TopicListView)
 }
 

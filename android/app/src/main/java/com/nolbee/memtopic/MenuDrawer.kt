@@ -10,7 +10,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -86,19 +85,6 @@ fun ModalNavigationDrawerMain(
                         onClick = {
                             scope.launch { drawerState.close() }
                             navController.navigate("TopicList") {
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    )
-                    NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                        label = { Text("플레이 설정") }, // TODO: replace this string with a string resource to achieve multi-language support.
-                        selected = navController.getCurrentRoute() == "SettingsView",
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                            navController.navigate("SettingsView") {
                                 popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }

@@ -7,13 +7,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.nolbee.memtopic.R
+import androidx.compose.ui.unit.sp
 import com.nolbee.memtopic.database.sampleTopic00
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 
@@ -23,17 +23,27 @@ import com.nolbee.memtopic.ui.theme.MemTopicTheme
 fun PlayTopicViewTopAppBar(
     vm: IPlayTopicViewModel,
 ) {
-    val playTopicTitle = stringResource(R.string.play_topic_title, vm.topicToPlay.title)
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = playTopicTitle,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Column {
+                        Text(
+                            text = "Play Topic", // TODO: use string resource
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = vm.topicToView.title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 },
+                actions = {
+                    PlayerSettingsButton(vm)
+                }
             )
         },
         content = { innerPadding ->
@@ -47,6 +57,10 @@ fun PlayTopicViewTopAppBar(
             }
         }
     )
+
+    if (vm.openBottomSheet) {
+        PlayerSettingsView(playTopicViewModel = vm)
+    }
 }
 
 
@@ -59,5 +73,16 @@ fun PlayTopicViewTopAppBarPreview() {
         PlayTopicViewTopAppBar(
             vm = vm
         )
+    }
+}
+
+@Composable
+private fun PlayerSettingsButton(vm: IPlayTopicViewModel) {
+    TextButton(
+        onClick = {
+            vm.openBottomSheet = true
+        }
+    ) {
+        Text("재생 설정")
     }
 }
