@@ -47,6 +47,7 @@ docs/
 ### 문서 템플릿
 
 각 카테고리별로 템플릿 파일을 제공합니다:
+
 - `reports/code-reviews/template.md`
 - 기타 필요시 추가
 
@@ -59,12 +60,15 @@ docs/
 ## 📚 현재 문서 목록
 
 ### Reports
+
 - [2025-08-29 종합 프로젝트 분석](./reports/code-reviews/2025-08-29-comprehensive-analysis.md)
 
 ### Architecture
+
 - *작성 예정*
 
 ### Development  
+
 - *작성 예정*
 
 ## 🔗 외부 참조
@@ -75,6 +79,7 @@ docs/
 ---
 
 **문서 기여 방법:**
+
 1. 필요한 디렉토리가 없으면 생성
 2. 적절한 카테고리와 명명 규칙에 따라 파일 생성
 3. 템플릿이 있다면 해당 템플릿 사용

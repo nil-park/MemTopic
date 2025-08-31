@@ -17,6 +17,7 @@
 MemTopic은 TTS(Text-to-Speech) 기술과 생성형 AI를 활용하여 기억 보존력과 발표 기술을 향상시키는 Android 앱입니다.
 
 ### 주요 기능
+
 - 주제별 컨텐츠 작성/편집
 - Google Cloud TTS를 통한 음성 변환
 - 문장별 반복 학습
@@ -24,6 +25,7 @@ MemTopic은 TTS(Text-to-Speech) 기술과 생성형 AI를 활용하여 기억 �
 - 학습 진행상황 추적
 
 ### 기술 스택
+
 - **언어**: Kotlin
 - **UI**: Jetpack Compose
 - **아키텍처**: MVVM + Repository Pattern
@@ -59,16 +61,19 @@ MemTopic은 TTS(Text-to-Speech) 기술과 생성형 AI를 활용하여 기억 �
 ### ⚠️ 개선이 필요한 부분
 
 #### 1. 패키지 구조 및 명명
+
 ```
 현재: account_view, edit_topic_view, play_topic_view
 권장: account, edit_topic, play_topic
 ```
 
 #### 2. 의존성 관리
+
 - 하드코딩된 버전 번호
 - Version Catalog 미사용
 
 #### 3. 테스트 커버리지
+
 - 단위 테스트 부족 (2개 파일만 존재)
 - UI 테스트 없음
 
@@ -77,10 +82,12 @@ MemTopic은 TTS(Text-to-Speech) 기술과 생성형 AI를 활용하여 기억 �
 ### 1. 보안 (Security) 🔒
 
 #### 현재 이슈
+
 - **API 키 노출 위험**: 소스코드에서 API 키가 직접 참조될 가능성
 - **네트워크 보안 구성 부족**
 
 #### 개선 방안
+
 ```kotlin
 // BuildConfig를 통한 API 키 관리
 android {
@@ -98,11 +105,13 @@ android {
 ### 2. 성능 (Performance) ⚡
 
 #### 현재 이슈
+
 - **메모리 누수 위험**: `CoroutineScope` 생명주기 관리
 - **캐시 크기 제한 없음**: 무한정 오디오 캐시 증가 가능
 - **대용량 텍스트 처리**: 문장 파싱 최적화 필요
 
 #### 개선 방안
+
 ```kotlin
 // AudioPlayer.kt 개선
 class AudioPlayer {
@@ -129,11 +138,13 @@ data class AudioCache(
 ### 3. 사용자 경험 (UX) 🎨
 
 #### 현재 이슈
+
 - **접근성 지원 부족**
 - **다크모드 지원 미흡**
 - **화면 전환 애니메이션 없음**
 
 #### 개선 방안
+
 ```kotlin
 // 접근성 개선
 @Composable
@@ -156,10 +167,12 @@ fun PlayableLineView(
 ### 4. 빌드 및 배포 (Build & Deployment) 🚀
 
 #### 현재 이슈
+
 - **ProGuard 비활성화**: Release 빌드 최적화 없음
 - **버전 관리**: 의존성 버전 중앙화 필요
 
 #### 개선 방안
+
 ```kotlin
 // build.gradle.kts - ProGuard 활성화
 android {
@@ -181,6 +194,7 @@ android {
 ### 🔴 High Priority (즉시 수정 필요)
 
 1. **보안 강화**
+
    ```
    - API 키 BuildConfig/환경변수로 이전
    - Network Security Config 추가
@@ -188,6 +202,7 @@ android {
    ```
 
 2. **안정성 개선**
+
    ```
    - TTS API 실패 시 Fallback 메커니즘
    - 네트워크 에러 핸들링 강화
@@ -195,6 +210,7 @@ android {
    ```
 
 3. **Release 빌드 최적화**
+
    ```
    - ProGuard/R8 활성화
    - 리소스 축소 활성화
@@ -204,6 +220,7 @@ android {
 ### 🟡 Medium Priority (단기 개선)
 
 4. **테스트 커버리지 확대**
+
    ```
    - Repository 계층 단위 테스트
    - ViewModel 테스트
@@ -211,6 +228,7 @@ android {
    ```
 
 5. **성능 최적화**
+
    ```
    - 오디오 캐시 크기 제한
    - 배터리 최적화 (Doze 모드 대응)
@@ -218,6 +236,7 @@ android {
    ```
 
 6. **개발 경험 개선**
+
    ```
    - Version Catalog 도입
    - CI/CD 파이프라인 구성
@@ -227,6 +246,7 @@ android {
 ### 🟢 Low Priority (중장기 개선)
 
 7. **아키텍처 개선**
+
    ```
    - 멀티모듈 구조로 리팩토링
    - Use Case 계층 도입
@@ -234,6 +254,7 @@ android {
    ```
 
 8. **사용자 경험 향상**
+
    ```
    - Material You 디자인 적용
    - 접근성 개선
@@ -245,6 +266,7 @@ android {
 ### 1. Version Catalog 도입
 
 **파일**: `gradle/libs.versions.toml`
+
 ```toml
 [versions]
 compose-bom = "2024.05.00"
@@ -355,6 +377,7 @@ class TopicRepositoryTest {
 ## 📊 메트릭스 및 모니터링
 
 ### 추가 권장 메트릭스
+
 1. **성능 메트릭스**
    - TTS 응답 시간
    - 오디오 캐시 히트율
@@ -375,6 +398,7 @@ class TopicRepositoryTest {
 MemTopic은 이미 견고한 기반 위에 구축된 프로젝트입니다. 제안된 개선사항들을 단계적으로 적용하면 더욱 안정적이고 사용자 친화적인 앱으로 발전할 수 있을 것입니다.
 
 **다음 단계:**
+
 1. High Priority 항목부터 순차적 적용
 2. 각 개선사항별 별도 브랜치에서 개발
 3. 충분한 테스트 후 메인 브랜치 통합

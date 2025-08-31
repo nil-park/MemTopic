@@ -2,6 +2,7 @@ package com.nolbee.memtopic
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -14,11 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
 import com.nolbee.memtopic.account_view.AccountViewTopAppBar
 import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
@@ -67,6 +71,27 @@ fun MainView(
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var startDestination by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    
+    // Double-back to exit state
+    var backPressedTime by remember { mutableStateOf(0L) }
+    val backPressedThreshold = 2000L // 2 seconds
+    
+    // Get current destination
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination?.route
+
+    // Handle back button press for TopicList only - double back to exit
+    BackHandler(enabled = currentDestination == "TopicList") {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - backPressedTime < backPressedThreshold) {
+            // Second back press within threshold - exit app
+            (context as? ComponentActivity)?.finish()
+        } else {
+            // First back press - just record time, no toast
+            backPressedTime = currentTime
+        }
+    }
 
     LaunchedEffect(Unit) {
         val playback = playbackRepository?.getPlaybackOnce()
