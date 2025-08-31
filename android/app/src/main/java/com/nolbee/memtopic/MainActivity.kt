@@ -1,6 +1,7 @@
 package com.nolbee.memtopic
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -22,7 +23,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.delay
 import com.nolbee.memtopic.account_view.AccountViewTopAppBar
 import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicViewModel
@@ -75,21 +75,72 @@ fun MainView(
     
     // Double-back to exit state
     var backPressedTime by remember { mutableStateOf(0L) }
-    val backPressedThreshold = 2000L // 2 seconds
+    val backPressedThreshold = 500L // 500 milliseconds
+    var pendingNavigation by remember { mutableStateOf(false) }
     
     // Get current destination
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
+    
+    // Track backstack depth with LaunchedEffect
+    LaunchedEffect(navBackStackEntry) {
+        navBackStackEntry?.let { entry ->
+            Log.d("Navigation", "Current destination: ${entry.destination.route}, BackStack changed")
+        }
+    }
+    
+    // Handle delayed navigation after back press
+    LaunchedEffect(pendingNavigation) {
+        if (pendingNavigation) {
+            kotlinx.coroutines.delay(backPressedThreshold)
+            if (pendingNavigation) { // Check if still pending (not cancelled by double back)
+                pendingNavigation = false
+                Log.d("Navigation", "TopicList -> PlayTopicView (adding to stack)")
+                navController.navigate("PlayTopicView")
+            }
+        }
+    }
 
-    // Handle back button press for TopicList only - double back to exit
-    BackHandler(enabled = currentDestination == "TopicList") {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - backPressedTime < backPressedThreshold) {
-            // Second back press within threshold - exit app
-            (context as? ComponentActivity)?.finish()
-        } else {
-            // First back press - just record time, no toast
-            backPressedTime = currentTime
+    // Handle back button press for circular navigation
+    BackHandler(enabled = currentDestination in listOf("TopicList", "PlayTopicView", "AccountView")) {
+        Log.d("Navigation", "BackHandler triggered for destination: $currentDestination")
+        when (currentDestination) {
+            "TopicList" -> {
+                val hasRecentPlayback = topicViewModel.topicToPlay.id != 0
+                val currentTime = System.currentTimeMillis()
+                
+                // Check for double back to exit
+                if (currentTime - backPressedTime < backPressedThreshold) {
+                    // Second back press within threshold - exit app
+                    Log.d("Navigation", "Double back detected - exiting app")
+                    pendingNavigation = false // Cancel any pending navigation
+                    (context as? ComponentActivity)?.finish()
+                } else {
+                    // First back press - record time
+                    backPressedTime = currentTime
+                    
+                    if (hasRecentPlayback) {
+                        // Set pending navigation and wait for double back check
+                        pendingNavigation = true
+                        Log.d("Navigation", "First back press - waiting for potential double back")
+                    }
+                    // If no recent playback, just record the back press time for potential exit
+                }
+            }
+            "PlayTopicView" -> {
+                // Navigate to TopicList and clear stack
+                Log.d("Navigation", "PlayTopicView -> TopicList (clearing stack)")
+                navController.navigate("TopicList") {
+                    popUpTo("PlayTopicView") { inclusive = true }
+                }
+            }
+            "AccountView" -> {
+                // Navigate to TopicList and clear stack
+                Log.d("Navigation", "AccountView -> TopicList (clearing stack)")
+                navController.navigate("TopicList") {
+                    popUpTo("AccountView") { inclusive = true }
+                }
+            }
         }
     }
 
