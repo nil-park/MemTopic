@@ -18,10 +18,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface IPlayTopicViewModel {
-    val topicToPlay: Topic
+    val topicToView: Topic
     val playableLines: MutableStateFlow<List<String>>
     val isCachedLines: MutableStateFlow<List<Boolean>>
     val currentLineIndex: MutableStateFlow<Int>
+    var openBottomSheet: Boolean
     fun setTopic(topic: Topic)
     fun setCurrentLine(index: Int)
 }
@@ -32,7 +33,7 @@ class PlayTopicViewModel @Inject constructor(
     private val playbackRepository: PlaybackRepository,
     private val audioCacheRepository: AudioCacheRepository,
 ) : ViewModel(), IPlayTopicViewModel {
-    override var topicToPlay: Topic by mutableStateOf(Topic())
+    override var topicToView: Topic by mutableStateOf(Topic())
         private set
 
     override var playableLines = MutableStateFlow<List<String>>(emptyList())
@@ -44,11 +45,13 @@ class PlayTopicViewModel @Inject constructor(
     override var currentLineIndex = MutableStateFlow(-1)
         private set
 
+    override var openBottomSheet by mutableStateOf(false)
+
     init {
         viewModelScope.launch {
             playbackRepository.getPlayback().collect { playback ->
                 playback?.let { p ->
-                    if (p.topicId != topicToPlay.id)
+                    if (p.topicId != topicToView.id || !p.isPlaying)
                         currentLineIndex.value = -1
                     else
                         currentLineIndex.value = p.sentenceIndex
@@ -61,7 +64,7 @@ class PlayTopicViewModel @Inject constructor(
                 .flatMapLatest { lines ->
                     audioCacheRepository.getIsCachedLines(
                         lines,
-                        topicToPlay.options
+                        topicToView.options
                     )
                 }
                 .collect { list ->
@@ -72,10 +75,9 @@ class PlayTopicViewModel @Inject constructor(
     }
 
     override fun setTopic(topic: Topic) {
-        this.topicToPlay = topic
-        val sentences = ContentParser.parseContentToSentences(topic.content)
+        topicToView = topic
+        val sentences = ContentParser.parseContentToSentences(topicToView.content)
         playableLines.update { sentences }
-        // TODO: If audio player service is not running, setCurrentLine(0)
     }
 
     override fun setCurrentLine(index: Int) {
@@ -88,7 +90,7 @@ class PlayTopicViewModel @Inject constructor(
 }
 
 class MockPlayTopicViewModel : ViewModel(), IPlayTopicViewModel {
-    override var topicToPlay: Topic by mutableStateOf(Topic())
+    override var topicToView: Topic by mutableStateOf(Topic())
         private set
 
     override var playableLines = MutableStateFlow<List<String>>(emptyList())
@@ -100,8 +102,10 @@ class MockPlayTopicViewModel : ViewModel(), IPlayTopicViewModel {
     override var currentLineIndex = MutableStateFlow(0)
         private set
 
+    override var openBottomSheet by mutableStateOf(false)
+
     override fun setTopic(topic: Topic) {
-        this.topicToPlay = topic
+        topicToView = topic
         val sentences = ContentParser.parseContentToSentences(topic.content)
         playableLines.update { sentences }
         val lines = MutableList(minOf(2, sentences.size)) { true }

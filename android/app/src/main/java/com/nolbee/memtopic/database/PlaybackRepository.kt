@@ -7,6 +7,10 @@ class PlaybackRepository(private val playbackDao: PlaybackDao) {
         return playbackDao.getPlayback()
     }
 
+    suspend fun getPlaybackOnce(): Playback? {
+        return playbackDao.getPlaybackOnce()
+    }
+
     suspend fun setCurrentLine(index: Int) {
         val playback = playbackDao.getPlaybackOnce()
         if (playback != null) {

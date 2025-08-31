@@ -17,6 +17,10 @@ class TopicRepository(private val topicDao: TopicDao) {
         topicDao.deleteTopic(topic)
     }
 
+    suspend fun getTopic(id: Int): Topic? {
+        return topicDao.getTopic(id)
+    }
+
     fun getTopicList(sortType: TopicSortType): Flow<List<Topic>> {
         return when (sortType) {
             TopicSortType.TITLE -> topicDao.selectTopicByName()

@@ -3,9 +3,9 @@
     <string name="add_new_topic_confirm">Do you really want to add a new topic "%1$s"?</string>
     <string name="edit_topic_confirm">Do you really want to edit topic "%1$s"?</string>
     <string name="delete_topic_confirm">Do you really want to delete topic "%1$s"?</string>
-    <string name="new_topic">New Topic</string>
-    <string name="edit_topic">Edit Topic</string>
+    <string name="new_topic">새 토픽</string>
+    <string name="edit_topic">토픽 편집</string>
     <string name="play_topic_title">Play Topic: "%1$s"</string>
-    <string name="default_gcp_language_code">en-US</string>
-    <string name="default_gcp_voice_name">en-US-Neural2-J</string>
+    <string name="default_gcp_language_code">ko-KR</string>
+    <string name="default_gcp_voice_name">ko-KR-Neural2-A</string>
 </resources>

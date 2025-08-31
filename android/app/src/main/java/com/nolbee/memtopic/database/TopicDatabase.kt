@@ -1,6 +1,6 @@
 package com.nolbee.memtopic.database
 
-import android.app.Application
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -9,6 +9,7 @@ import androidx.room.TypeConverters
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.util.Date
 import javax.inject.Singleton
@@ -32,7 +33,7 @@ class Converters {
         AudioCache::class,
         SettingEntity::class,
     ],
-    version = 5
+    version = 6
 )
 @TypeConverters(
     Converters::class
@@ -49,50 +50,50 @@ abstract class TopicDatabase : RoomDatabase() {
 object TopicDatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(app: Application): TopicDatabase {
-        return Room.databaseBuilder(app, TopicDatabase::class.java, "topicDatabase")
-            .addMigrations(MIGRATION_3_4)
-            .addMigrations(MIGRATION_4_5)
-            .build()
-    }
+    fun provideDatabase(
+        @ApplicationContext context: Context
+    ): TopicDatabase = Room.databaseBuilder(
+        context,
+        TopicDatabase::class.java,
+        "topicDatabase"
+    )
+        .addMigrations(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+        .build()
 
     @Provides
-    fun provideTopicDao(db: TopicDatabase): TopicDao {
-        return db.topicDao()
-    }
+    fun provideTopicDao(db: TopicDatabase) = db.topicDao()
 
     @Provides
-    fun providePlaybackDao(db: TopicDatabase): PlaybackDao {
-        return db.playbackDao()
-    }
+    fun providePlaybackDao(db: TopicDatabase) = db.playbackDao()
 
     @Provides
-    fun provideAudioCacheDao(db: TopicDatabase): AudioCacheDao {
-        return db.audioCacheDao()
-    }
+    fun provideAudioCacheDao(db: TopicDatabase) = db.audioCacheDao()
 
     @Provides
-    fun provideSettingsDao(db: TopicDatabase): SettingsDao {
-        return db.settingsDao()
-    }
+    fun provideSettingsDao(db: TopicDatabase) = db.settingsDao()
 
     @Provides
-    fun provideTopicRepository(topicDao: TopicDao): TopicRepository {
-        return TopicRepository(topicDao)
-    }
+    @Singleton
+    fun provideTopicRepository(
+        topicDao: TopicDao
+    ) = TopicRepository(topicDao)
 
     @Provides
-    fun providePlaybackRepository(playbackDao: PlaybackDao): PlaybackRepository {
-        return PlaybackRepository(playbackDao)
-    }
+    @Singleton
+    fun providePlaybackRepository(
+        playbackDao: PlaybackDao
+    ) = PlaybackRepository(playbackDao)
 
     @Provides
-    fun provideAudioCacheRepository(audioCacheDao: AudioCacheDao): AudioCacheRepository {
-        return AudioCacheRepository(audioCacheDao)
-    }
+    @Singleton
+    fun provideAudioCacheRepository(
+        @ApplicationContext context: Context,
+        audioCacheDao: AudioCacheDao
+    ) = AudioCacheRepository(context, audioCacheDao)
 
     @Provides
-    fun provideSettingsRepository(settingsDao: SettingsDao): SettingsRepository {
-        return SettingsRepository(settingsDao)
-    }
+    @Singleton
+    fun provideSettingsRepository(
+        settingsDao: SettingsDao
+    ) = SettingsRepository(settingsDao)
 }

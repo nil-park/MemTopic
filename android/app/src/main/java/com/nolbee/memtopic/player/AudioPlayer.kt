@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
@@ -85,7 +86,7 @@ class AudioPlayer(
             sentenceIndex = sentenceIndex,
             currentRepetition = 0,
             totalRepetitions = settings.sentenceReputation,
-            isInterval = false,
+            isPlaying = true,
             content = topic.content,
         )
         playbackDao.upsertPlayback(playback)
@@ -141,6 +142,11 @@ class AudioPlayer(
     }
 
     fun stop() {
+        runBlocking {
+            playbackDao.getPlaybackOnce()?.let { playback ->
+                playbackDao.upsertPlayback(playback.copy(isPlaying = false))
+            }
+        }
         serviceScope.launch(Dispatchers.Main) {
             mediaPlayerWithIntervalSound.stop()
         }
