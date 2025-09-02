@@ -39,6 +39,17 @@ MemTopic 애플리케이션의 아이콘을 생성하여 브랜드 아이덴티�
 
 ## 결과물
 
-- **파일**: `/assets/icons/drafts/AppIconVectorized.svg`
+- **파일**: `/assets/icons/v1/AppIconVectorized.svg`
 - **색상**: 배경 그라데이션 (#3498DB → #2C3E50), 모든 요소 #F1C40F
 - **특징**: 전구 중앙 톱니바퀴 부분 투명 처리
+
+## 파일 구조
+
+```plaintext
+assets/icons/
+├── drafts/
+│   └── AppIcon.png (원본 시안)
+└── v1/
+    ├── AppIconVectorized.svg (완성된 벡터 v1)
+    └── AppIconVectorized.zip (PNG 변환용)
+```
