@@ -28,8 +28,8 @@ Java/Android 내장 국제화 텍스트 분할 API 활용:
 ## 작업 스펙
 
 - [x] 현재 함수 분석 완료 (`ContentParser.kt`)
-- [ ] BreakIterator 기반 새 구현 작성
-- [ ] 기존 실패 케이스 테스트 작성
+- [x] BreakIterator 기반 새 구현 작성
+- [x] 기존 실패 케이스 테스트 작성
 - [ ] 새 구현으로 테스트 통과 확인
 - [ ] 기존 호출부와 호환성 검증
 
@@ -43,67 +43,33 @@ Java/Android 내장 국제화 텍스트 분할 API 활용:
 "First sentence.\n\nSecond sentence." → ["First sentence.", "Second sentence."] ✅
 ```
 
-## 구현 방향
+## 구현 범위
 
-```kotlin
-object ContentParser {
-    fun parseContentToSentences(content: String): List<String> {
-        val iterator = BreakIterator.getSentenceInstance()
-        iterator.setText(content.replace(Regex("\\s+"), " ").trim())
-        
-        val sentences = mutableListOf<String>()
-        var start = iterator.first()
-        
-        while (start != BreakIterator.DONE) {
-            val end = iterator.next()
-            if (end != BreakIterator.DONE) {
-                val sentence = content.substring(start, end).trim()
-                if (sentence.isNotBlank()) sentences.add(sentence)
-            }
-            start = end
-        }
-        
-        return sentences
-    }
-}
-```
+아래 파일들만 수정할 것
 
-## 진행 상황
-
-- ✅ 브랜치 생성 완료
-- ✅ 현재 구현 분석 완료 (`ContentParser.kt:4-28`)
-- ✅ 기술적 방향성 결정 (BreakIterator)
-- ✅ Draft PR 생성 완료 (#54)
-- ✅ BreakIterator 기반 새 구현 완료
-- ✅ 포괄적 테스트 케이스 작성 완료
-- ✅ 코드 커밋 완료 (983504e)
-- [ ] 테스트 실행 및 검증 (Java 환경 필요)
-- [ ] 기존 코드와 호환성 확인
-- [ ] PR Ready for Review 전환
-
-## 구현 완료 내용
-
-### 1. ContentParser.kt 개선
-- **Before**: 단순한 `.?!` 문자 기반 분할 + 개행 처리
-- **After**: BreakIterator + 공백 정규화 + 빈 문장 필터링
-
-### 2. 테스트 케이스 (ContentParserTest.kt)
-- 12개 테스트 케이스 작성
-- 빈 문자열, 축약어, 소수점, 한국어, 혼합언어, 유니코드 구두점 등 커버
-
-### 3. 커밋 상태
-- 브랜치: `feature/35-improve-parseContentToSentences-unicode-support`
-- 최신 커밋: `983504e` (미푸시 상태)
-- Draft PR: https://github.com/nil-park/MemTopic/pull/54
-
-## 다음 작업 (재개 시)
-
-1. `git push` - 최신 구현 푸시
-2. Java 환경 설정 후 테스트 실행
-3. 실제 앱에서 동작 검증
-4. Draft PR을 Ready for Review로 전환
-5. 이슈 #35 완료
+- `android/app/src/main/java/com/nolbee/memtopic/utils/ContentParser.kt`
+- `android/app/src/test/java/com/nolbee/memtopic/utils/ContentParserTest.kt`
+- `docs/development/plans/2025-09-03-feature-35-improve-parseContentToSentences.md`
 
 ## 상태
 
-**⏸️ 작업 중단** - 핵심 구현 완료, 테스트 검증 남음 (2025-09-03)
+### commit ac096ea3
+
+- 다음 라인 전체를 하나의 발화 단위로 인식했으면 좋겠는데, 그렇게 안됨.
+
+  ```plaintext
+  "Oh no, How will I chop wood without my axe?" he cried.
+  ```
+
+  - Desired: `"Oh no, How will I chop wood without my axe?" he cried.`
+  - Got: `"Oh no, How will I chop wood without my axe?"`, `he cried.`
+
+- 스페이스로 나뉘어진 문단은 분리했으면 좋겠는데, 하나로 보임.
+
+  ```plaintext
+  The spirit became furious, "You lier, I'll teach you a lesson"
+  A splash of water burst from the lake and drenched Chilseong.
+  ```
+
+  - Desired: `The spirit became furious, "You lier, I'll teach you a lesson"`, `A splash of water burst from the lake and drenched Chilseong.`
+  - Got: `The spirit became furious, "You lier, I'll teach you a lesson" A splash of water burst from the lake and drenched Chilseong.`
