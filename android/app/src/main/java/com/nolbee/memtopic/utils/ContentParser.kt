@@ -7,11 +7,75 @@ object ContentParser {
     fun parseContentToSentences(content: String): List<String> {
         if (content.isBlank()) return emptyList()
         
-        // Handle line breaks that separate sentences without punctuation
-        val processedContent = handleLineBreakSentences(content)
+        // First, handle paragraph separation by line breaks
+        val paragraphs = content.split(Regex("[\\r\\n]+"))
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+        
+        val allSentences = mutableListOf<String>()
+        
+        for (paragraph in paragraphs) {
+            // Check if paragraph needs punctuation at the end
+            val processedParagraph = if (!paragraph.matches(Regex(".*[.!?。！？\"\"']\\s*$"))) {
+                "$paragraph."
+            } else {
+                paragraph
+            }
+            
+            // Parse sentences with quoted text handling
+            val sentences = parseWithQuotedTextHandling(processedParagraph)
+            allSentences.addAll(sentences)
+        }
+        
+        return allSentences
+    }
+    
+    private fun parseWithQuotedTextHandling(text: String): List<String> {
+        // Store all tokenized parts and replace with tokens
+        val tokenizedParts = mutableListOf<String>()
+        
+        // First, tokenize quoted text (double quotes)
+        var processedText = text.replace(Regex("\"[^\"]*\"")) { match ->
+            tokenizedParts.add(match.value)
+            "<<TOKEN_${tokenizedParts.size - 1}>>"
+        }
+        
+        // Handle single quotes
+        processedText = processedText.replace(Regex("'[^']*'")) { match ->
+            tokenizedParts.add(match.value)
+            "<<TOKEN_${tokenizedParts.size - 1}>>"
+        }
+        
+        // Handle unicode quotes
+        processedText = processedText.replace(Regex("\"[^\"]*\"")) { match ->
+            tokenizedParts.add(match.value)
+            "<<TOKEN_${tokenizedParts.size - 1}>>"
+        }
+        
+        // Tokenize common abbreviations to prevent incorrect splitting
+        processedText = processedText.replace(Regex("\\b(Dr|Mr|Mrs|Ms|Prof|Sr|Jr|U\\.S\\.A|U\\.K|N\\.Y\\.C)\\.")) { match ->
+            tokenizedParts.add(match.value)
+            "<<TOKEN_${tokenizedParts.size - 1}>>"
+        }
+        
+        // Handle decimal numbers
+        processedText = processedText.replace(Regex("\\b\\d+\\.\\d+\\b")) { match ->
+            tokenizedParts.add(match.value)
+            "<<TOKEN_${tokenizedParts.size - 1}>>"
+        }
         
         // Normalize whitespace characters
-        val normalizedContent = processedContent.replace(Regex("\\s+"), " ").trim()
+        val normalizedContent = processedText.replace(Regex("\\s+"), " ").trim()
+        
+        // Special case: if it's just punctuation, don't split it
+        if (normalizedContent.matches(Regex("^[.!?\\s…]+$"))) {
+            // Restore tokens before returning
+            var restored = normalizedContent
+            tokenizedParts.forEachIndexed { index, token ->
+                restored = restored.replace("<<TOKEN_$index>>", token)
+            }
+            return listOf(restored)
+        }
         
         // Use BreakIterator for proper sentence segmentation
         val iterator = BreakIterator.getSentenceInstance(Locale.getDefault())
@@ -31,25 +95,29 @@ object ContentParser {
             start = end
         }
         
-        return sentences
-    }
-    
-    private fun handleLineBreakSentences(text: String): String {
-        val lines = text.split(Regex("[\r\n]+"))
-        val processedLines = mutableListOf<String>()
-        
-        for (line in lines) {
-            val trimmedLine = line.trim()
-            if (trimmedLine.isNotBlank()) {
-                // If line doesn't end with sentence punctuation, add period
-                if (!trimmedLine.matches(Regex(".*[.!?。！？]\\s*$"))) {
-                    processedLines.add("$trimmedLine.")
-                } else {
-                    processedLines.add(trimmedLine)
+        // Post-process: handle cases where BreakIterator failed to split after tokenized abbreviations
+        val fixedSentences = mutableListOf<String>()
+        for (sentence in sentences) {
+            // Simple split on ". [Capital letter]" pattern - much simpler approach
+            val parts = sentence.split(Regex("\\. +(?=[A-Z])"))
+            if (parts.size > 1) {
+                // Add periods back to all but the last part
+                for (i in 0 until parts.size - 1) {
+                    fixedSentences.add("${parts[i]}.")
                 }
+                fixedSentences.add(parts.last())
+            } else {
+                fixedSentences.add(sentence)
             }
         }
         
-        return processedLines.joinToString(" ")
+        // Restore all tokenized parts
+        return fixedSentences.map { sentence ->
+            var restored = sentence
+            tokenizedParts.forEachIndexed { index, token ->
+                restored = restored.replace("<<TOKEN_$index>>", token)
+            }
+            restored
+        }
     }
 }
