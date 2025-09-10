@@ -15,15 +15,8 @@ object ContentParser {
         val allSentences = mutableListOf<String>()
 
         for (paragraph in paragraphs) {
-            // Check if paragraph needs punctuation at the end
-            val processedParagraph = if (!paragraph.matches(Regex(".*[.!?。！？\"\"']\\s*$"))) {
-                "$paragraph."
-            } else {
-                paragraph
-            }
-
             // Parse sentences with quoted text handling
-            val sentences = parseWithQuotedTextHandling(processedParagraph)
+            val sentences = parseWithQuotedTextHandling(paragraph)
             allSentences.addAll(sentences)
         }
 

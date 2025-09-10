@@ -157,8 +157,8 @@ class ContentParserTest {
         val result = ContentParser.parseContentToSentences(content)
         assertEquals(
             listOf(
-                "First line without punctuation.",
-                "Second line also without punctuation.",
+                "First line without punctuation",
+                "Second line also without punctuation",
                 "Third line with period."
             ),
             result
@@ -172,7 +172,7 @@ class ContentParserTest {
         assertEquals(
             listOf(
                 "Line with period.",
-                "Line without punctuation.",
+                "Line without punctuation",
                 "Another line!"
             ),
             result
