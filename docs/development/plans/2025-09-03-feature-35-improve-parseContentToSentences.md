@@ -30,8 +30,8 @@ Java/Android 내장 국제화 텍스트 분할 API 활용:
 - [x] 현재 함수 분석 완료 (`ContentParser.kt`)
 - [x] BreakIterator 기반 새 구현 작성
 - [x] 기존 실패 케이스 테스트 작성
-- [ ] 새 구현으로 테스트 통과 확인
-- [ ] 기존 호출부와 호환성 검증
+- [x] 새 구현으로 테스트 통과 확인
+- [x] 기존 호출부와 호환성 검증
 
 ## 예상 결과
 
@@ -88,3 +88,12 @@ Java/Android 내장 국제화 텍스트 분할 API 활용:
   - Got: `Mr. and Mrs. Smith live in U.S.A. They moved from U.K.`
 
 - `ContentParser.kt` 파일의 `parseWithQuotedTextHandling` 함수가 너무 긴 것 같다. 주석은 줄이고 대신 함수를 나눠서 함수 이름으로 기능을 확인할 수 있게 하고, 유닛 테스트가 가능하게 하자.
+
+### commit ccf617b1
+
+- 리팩토링 완료
+- 구두점이 없는 문장에 꼭 구두점을 넣을 필요는 없을 것 같은데?
+
+### commit 4e20da5
+
+- 자동 마침표 추가 로직 제거하여 원문을 나누기만 하고 없는 것을 넣지 않게 변경
