@@ -7,9 +7,13 @@ object ContentParser {
     fun parseContentToSentences(content: String): List<String> {
         if (content.isBlank()) return emptyList()
         
-        // Normalize whitespace characters
-        val normalizedContent = content.replace(Regex("\\s+"), " ").trim()
+        // Handle line breaks that separate sentences without punctuation
+        val processedContent = handleLineBreakSentences(content)
         
+        // Normalize whitespace characters
+        val normalizedContent = processedContent.replace(Regex("\\s+"), " ").trim()
+        
+        // Use BreakIterator for proper sentence segmentation
         val iterator = BreakIterator.getSentenceInstance(Locale.getDefault())
         iterator.setText(normalizedContent)
         
@@ -28,5 +32,24 @@ object ContentParser {
         }
         
         return sentences
+    }
+    
+    private fun handleLineBreakSentences(text: String): String {
+        val lines = text.split(Regex("[\r\n]+"))
+        val processedLines = mutableListOf<String>()
+        
+        for (line in lines) {
+            val trimmedLine = line.trim()
+            if (trimmedLine.isNotBlank()) {
+                // If line doesn't end with sentence punctuation, add period
+                if (!trimmedLine.matches(Regex(".*[.!?。！？]\\s*$"))) {
+                    processedLines.add("$trimmedLine.")
+                } else {
+                    processedLines.add(trimmedLine)
+                }
+            }
+        }
+        
+        return processedLines.joinToString(" ")
     }
 }

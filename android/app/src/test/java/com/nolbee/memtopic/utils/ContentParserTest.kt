@@ -148,4 +148,32 @@ class ContentParserTest {
             result
         )
     }
+
+    @Test
+    fun `parseContentToSentences should handle line breaks without punctuation`() {
+        val content = "First line without punctuation\nSecond line also without punctuation\nThird line with period."
+        val result = ContentParser.parseContentToSentences(content)
+        assertEquals(
+            listOf(
+                "First line without punctuation.",
+                "Second line also without punctuation.",
+                "Third line with period."
+            ), 
+            result
+        )
+    }
+
+    @Test
+    fun `parseContentToSentences should handle mixed line breaks and punctuation`() {
+        val content = "Line with period.\nLine without punctuation\nAnother line!"
+        val result = ContentParser.parseContentToSentences(content)
+        assertEquals(
+            listOf(
+                "Line with period.",
+                "Line without punctuation.",
+                "Another line!"
+            ), 
+            result
+        )
+    }
 }

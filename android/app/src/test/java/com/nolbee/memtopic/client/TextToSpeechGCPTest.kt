@@ -12,7 +12,7 @@ class TextToSpeechGCPTest {
     fun `test TTS client`() = runBlocking {
         val apiKey = System.getenv("GCP_TTS_API_KEY") ?: error("No credentials found")
         val client = TextToSpeechGCP(apiKey)
-        val audioBase64 = client.synthesize("Hello World!")
+        val audioBase64 = client.synthesize("Hello World!", "en-US", "en-US-Standard-A")
         // println("Base64 String: $audioBase64")
 
         assertFalse("Audio Base64 string should not be empty", audioBase64.isEmpty())
