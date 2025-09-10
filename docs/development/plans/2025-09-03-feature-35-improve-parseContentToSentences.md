@@ -73,3 +73,18 @@ Java/Android 내장 국제화 텍스트 분할 API 활용:
 
   - Desired: `The spirit became furious, "You lier, I'll teach you a lesson"`, `A splash of water burst from the lake and drenched Chilseong.`
   - Got: `The spirit became furious, "You lier, I'll teach you a lesson" A splash of water burst from the lake and drenched Chilseong.`
+
+### commit 84311640
+
+- 위 두 케이스는 커버됨.
+
+- 다음 라인은 테스트 실패 반복됨. 이런 예외까지 처리하기에는 룰 베이스 코드로는 너무 과하다고 판단해서 주석 처리함.
+
+  ```plaintext
+  Mr. and Mrs. Smith live in U.S.A. They moved from U.K.
+  ```
+
+  - Desired: `Mr. and Mrs. Smith live in U.S.A.`, `They moved from U.K.`
+  - Got: `Mr. and Mrs. Smith live in U.S.A. They moved from U.K.`
+
+- `ContentParser.kt` 파일의 `parseWithQuotedTextHandling` 함수가 너무 긴 것 같다. 주석은 줄이고 대신 함수를 나눠서 함수 이름으로 기능을 확인할 수 있게 하고, 유닛 테스트가 가능하게 하자.

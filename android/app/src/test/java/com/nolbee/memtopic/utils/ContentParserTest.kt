@@ -1,6 +1,7 @@
 package com.nolbee.memtopic.utils
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -201,5 +202,71 @@ class ContentParserTest {
         content = content.replace("\n", "\r")
         result = ContentParser.parseContentToSentences(content)
         assertEquals(desired, result)
+    }
+
+    @Test
+    fun `tokenizeSpecialContent should tokenize quotes correctly`() {
+        val tokenizedParts = mutableListOf<String>()
+        val result = ContentParser.tokenizeSpecialContent(
+            "He said \"hello world\" and 'goodbye'.",
+            tokenizedParts
+        )
+
+        assertEquals(2, tokenizedParts.size)
+        assertEquals("\"hello world\"", tokenizedParts[0])
+        assertEquals("'goodbye'", tokenizedParts[1])
+        assertEquals("He said <<TOKEN_0>> and <<TOKEN_1>>.", result)
+    }
+
+    @Test
+    fun `tokenizeSpecialContent should tokenize abbreviations correctly`() {
+        val tokenizedParts = mutableListOf<String>()
+        val result = ContentParser.tokenizeSpecialContent(
+            "Dr. Smith went to U.S.A. yesterday.",
+            tokenizedParts
+        )
+
+        assertEquals(2, tokenizedParts.size)
+        assertEquals("Dr.", tokenizedParts[0])
+        assertEquals("U.S.A.", tokenizedParts[1])
+        assertEquals("<<TOKEN_0>> Smith went to <<TOKEN_1>> yesterday.", result)
+    }
+
+    @Test
+    fun `tokenizeSpecialContent should tokenize decimal numbers correctly`() {
+        val tokenizedParts = mutableListOf<String>()
+        val result = ContentParser.tokenizeSpecialContent(
+            "I have 2.5 dollars and paid 3.14 for coffee.",
+            tokenizedParts
+        )
+
+        assertEquals(2, tokenizedParts.size)
+        assertEquals("2.5", tokenizedParts[0])
+        assertEquals("3.14", tokenizedParts[1])
+        assertEquals("I have <<TOKEN_0>> dollars and paid <<TOKEN_1>> for coffee.", result)
+    }
+
+    @Test
+    fun `normalizeWhitespace should normalize multiple spaces and tabs`() {
+        val result = ContentParser.normalizeWhitespace("Hello    world\t\ntest")
+        assertEquals("Hello world test", result)
+    }
+
+    @Test
+    fun `isPurelyPunctuation should identify punctuation-only text`() {
+        assertTrue(ContentParser.isPurelyPunctuation("... !!! ???"))
+        assertTrue(ContentParser.isPurelyPunctuation("!"))
+        assertFalse(ContentParser.isPurelyPunctuation("Hello!"))
+        assertFalse(ContentParser.isPurelyPunctuation("Test."))
+    }
+
+    @Test
+    fun `restoreTokens should replace tokens with original text`() {
+        val tokenizedParts = listOf("\"hello\"", "2.5")
+        val result = ContentParser.restoreTokens(
+            "He said <<TOKEN_0>> and paid <<TOKEN_1>> dollars.",
+            tokenizedParts
+        )
+        assertEquals("He said \"hello\" and paid 2.5 dollars.", result)
     }
 }
