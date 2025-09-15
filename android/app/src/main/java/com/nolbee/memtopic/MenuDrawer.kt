@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -91,6 +92,19 @@ fun ModalNavigationDrawerMain(
                         },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.ImportExport, contentDescription = null) },
+                        label = { Text("토픽 내보내기/가져오기") }, // TODO: replace this string with a string resource to achieve multi-language support.
+                        selected = navController.getCurrentRoute() == "ExportImportView",
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate("ExportImportView") {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
                 }
             }
         },
@@ -120,6 +134,7 @@ fun ModalNavigationDrawerMainPreview() {
                     composable("AccountView") { NavigationContentSample() }
                     composable("TopicList") { NavigationContentSample() }
                     composable("EditTopicView") { NavigationContentSample() }
+                    composable("ExportImportView") { NavigationContentSample() }
                 }
             }
         )

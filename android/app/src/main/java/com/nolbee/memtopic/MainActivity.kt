@@ -36,6 +36,9 @@ import com.nolbee.memtopic.play_topic_view.PlayTopicViewModel
 import com.nolbee.memtopic.play_topic_view.PlayTopicViewTopAppBar
 import com.nolbee.memtopic.topic_list_view.TopicListTopAppBar
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
+import com.nolbee.memtopic.utils.ExportImportView
+import com.nolbee.memtopic.utils.TopicExporter
+import com.nolbee.memtopic.utils.TopicImporter
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -72,23 +75,26 @@ fun MainView(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var startDestination by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
-    
+
     // Double-back to exit state
     var backPressedTime by remember { mutableStateOf(0L) }
     val backPressedThreshold = 500L // 500 milliseconds
     var pendingNavigation by remember { mutableStateOf(false) }
-    
+
     // Get current destination
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
-    
+
     // Track backstack depth with LaunchedEffect
     LaunchedEffect(navBackStackEntry) {
         navBackStackEntry?.let { entry ->
-            Log.d("Navigation", "Current destination: ${entry.destination.route}, BackStack changed")
+            Log.d(
+                "Navigation",
+                "Current destination: ${entry.destination.route}, BackStack changed"
+            )
         }
     }
-    
+
     // Handle delayed navigation after back press
     LaunchedEffect(pendingNavigation) {
         if (pendingNavigation) {
@@ -102,13 +108,19 @@ fun MainView(
     }
 
     // Handle back button press for circular navigation
-    BackHandler(enabled = currentDestination in listOf("TopicList", "PlayTopicView", "AccountView")) {
+    BackHandler(
+        enabled = currentDestination in listOf(
+            "TopicList",
+            "PlayTopicView",
+            "AccountView"
+        )
+    ) {
         Log.d("Navigation", "BackHandler triggered for destination: $currentDestination")
         when (currentDestination) {
             "TopicList" -> {
                 val hasRecentPlayback = topicViewModel.topicToPlay.id != 0
                 val currentTime = System.currentTimeMillis()
-                
+
                 // Check for double back to exit
                 if (currentTime - backPressedTime < backPressedThreshold) {
                     // Second back press within threshold - exit app
@@ -118,7 +130,7 @@ fun MainView(
                 } else {
                     // First back press - record time
                     backPressedTime = currentTime
-                    
+
                     if (hasRecentPlayback) {
                         // Set pending navigation and wait for double back check
                         pendingNavigation = true
@@ -127,6 +139,7 @@ fun MainView(
                     // If no recent playback, just record the back press time for potential exit
                 }
             }
+
             "PlayTopicView" -> {
                 // Navigate to TopicList and clear stack
                 Log.d("Navigation", "PlayTopicView -> TopicList (clearing stack)")
@@ -134,6 +147,7 @@ fun MainView(
                     popUpTo("PlayTopicView") { inclusive = true }
                 }
             }
+
             "AccountView" -> {
                 // Navigate to TopicList and clear stack
                 Log.d("Navigation", "AccountView -> TopicList (clearing stack)")
@@ -208,6 +222,19 @@ fun MainView(
                         }
                         PlayTopicViewTopAppBar(
                             vm = playTopicViewModel,
+                        )
+                    }
+                    composable(
+                        "ExportImportView",
+                        enterTransition = { EnterTransition.None },
+                        exitTransition = { ExitTransition.None }
+                    ) {
+                        val context = LocalContext.current
+                        ExportImportView(
+                            navController = navController,
+                            topicViewModel = topicViewModel,
+                            topicExporter = TopicExporter(context),
+                            topicImporter = TopicImporter(context, topicRepository!!)
                         )
                     }
                 }
