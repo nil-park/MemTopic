@@ -39,25 +39,25 @@ MemTopic 앱의 Topic 데이터를 JSON 형식으로 내보내고 가져올 수 
 
 ## 작업 스펙
 
-- [ ] **Step 1: Topic 데이터 직렬화 구조 설계**
+- [x] **Step 1: Topic 데이터 직렬화 구조 설계**
   - JSON 스키마 정의 (버전 정보, export 날짜, topics 배열)
   - kotlinx.serialization 의존성 추가
   - Topic 데이터 클래스용 Serializable 래퍼 클래스 생성
   - Date 타입에 대한 커스텀 직렬화 처리
 
-- [ ] **Step 2: Topic Export 기능 구현**
+- [x] **Step 2: Topic Export 기능 구현**
   - TopicExporter 유틸리티 클래스 생성
   - TopicRepository에 모든 Topic을 동기적으로 조회하는 메서드 추가
   - Topic 리스트를 JSON으로 변환하는 로직 구현
   - Storage Access Framework를 사용한 파일 저장 구현
 
-- [ ] **Step 3: Topic Import 기능 구현**  
+- [x] **Step 3: Topic Import 기능 구현**  
   - TopicImporter 유틸리티 클래스 생성
   - JSON 파일 파싱 및 유효성 검증 로직 구현
   - 중복 제목 처리 전략 구현 (제목에 번호 추가 방식)
   - 일괄 insert 트랜잭션 처리
 
-- [ ] **Step 4: Export/Import UI 구현**
+- [x] **Step 4: Export/Import UI 구현**
   - ExportImportView Composable 생성
   - Export 버튼 및 성공/실패 Toast 메시지
   - Import 파일 선택기 및 진행 상태 표시
