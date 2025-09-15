@@ -42,6 +42,9 @@ interface TopicDao {
 
     @Query("SELECT * FROM topic ORDER BY lastPlayback DESC")
     fun selectTopicByLastPlayback(): Flow<List<Topic>>
+
+    @Query("SELECT * FROM topic ORDER BY title ASC")
+    suspend fun getAllTopics(): List<Topic>
 }
 
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)

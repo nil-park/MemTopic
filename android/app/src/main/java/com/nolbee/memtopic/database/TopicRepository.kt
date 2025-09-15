@@ -28,4 +28,8 @@ class TopicRepository(private val topicDao: TopicDao) {
             TopicSortType.LAST_PLAYBACK -> topicDao.selectTopicByLastPlayback()
         }
     }
+
+    suspend fun getAllTopics(): List<Topic> {
+        return topicDao.getAllTopics()
+    }
 }
