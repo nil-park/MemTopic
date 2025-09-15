@@ -3,8 +3,8 @@ package com.nolbee.memtopic.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.nolbee.memtopic.database.ITopicRepository
 import com.nolbee.memtopic.database.Topic
-import com.nolbee.memtopic.database.TopicRepository
 import kotlinx.serialization.json.Json
 import java.util.Date
 
@@ -21,7 +21,7 @@ sealed class ImportResult {
  */
 class TopicImporter(
     private val context: Context,
-    private val repository: TopicRepository
+    private val repository: ITopicRepository
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 

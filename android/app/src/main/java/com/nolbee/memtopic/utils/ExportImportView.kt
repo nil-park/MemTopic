@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.database.ITopicViewModel
+import com.nolbee.memtopic.database.MockTopicRepository
 import com.nolbee.memtopic.database.MockTopicViewModel
 import com.nolbee.memtopic.ui.theme.MemTopicTheme
 import kotlinx.coroutines.launch
@@ -266,10 +267,7 @@ fun ExportImportViewPreview() {
             navController = rememberNavController(),
             topicViewModel = MockTopicViewModel(),
             topicExporter = TopicExporter(context),
-            topicImporter = TopicImporter(
-                context,
-                MockTopicViewModel() as com.nolbee.memtopic.database.TopicRepository
-            )
+            topicImporter = TopicImporter(context, MockTopicRepository())
         )
     }
 }

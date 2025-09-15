@@ -8,20 +8,28 @@ enum class TopicSortType {
     LAST_PLAYBACK
 }
 
-class TopicRepository(private val topicDao: TopicDao) {
-    suspend fun upsertTopic(topic: Topic) {
+interface ITopicRepository {
+    suspend fun upsertTopic(topic: Topic)
+    suspend fun deleteTopic(topic: Topic)
+    suspend fun getTopic(id: Int): Topic?
+    fun getTopicList(sortType: TopicSortType): Flow<List<Topic>>
+    suspend fun getAllTopics(): List<Topic>
+}
+
+class TopicRepository(private val topicDao: TopicDao) : ITopicRepository {
+    override suspend fun upsertTopic(topic: Topic) {
         topicDao.upsertTopic(topic)
     }
 
-    suspend fun deleteTopic(topic: Topic) {
+    override suspend fun deleteTopic(topic: Topic) {
         topicDao.deleteTopic(topic)
     }
 
-    suspend fun getTopic(id: Int): Topic? {
+    override suspend fun getTopic(id: Int): Topic? {
         return topicDao.getTopic(id)
     }
 
-    fun getTopicList(sortType: TopicSortType): Flow<List<Topic>> {
+    override fun getTopicList(sortType: TopicSortType): Flow<List<Topic>> {
         return when (sortType) {
             TopicSortType.TITLE -> topicDao.selectTopicByName()
             TopicSortType.LAST_MODIFIED -> topicDao.selectTopicByLastModified()
@@ -29,7 +37,17 @@ class TopicRepository(private val topicDao: TopicDao) {
         }
     }
 
-    suspend fun getAllTopics(): List<Topic> {
+    override suspend fun getAllTopics(): List<Topic> {
         return topicDao.getAllTopics()
     }
+}
+
+class MockTopicRepository : ITopicRepository {
+    override suspend fun upsertTopic(topic: Topic) {}
+    override suspend fun deleteTopic(topic: Topic) {}
+    override suspend fun getTopic(id: Int): Topic? = null
+    override fun getTopicList(sortType: TopicSortType): Flow<List<Topic>> =
+        kotlinx.coroutines.flow.flowOf(emptyList())
+
+    override suspend fun getAllTopics(): List<Topic> = emptyList()
 }
