@@ -68,7 +68,7 @@ fun ModalNavigationDrawerMain(
                         onClick = {
                             scope.launch { drawerState.close() }
                             navController.navigate("AccountView") {
-                                popUpTo(0) { inclusive = true }
+                                popUpTo("TopicList") { inclusive = false }
                                 launchSingleTop = true
                             }
                         },
@@ -86,7 +86,7 @@ fun ModalNavigationDrawerMain(
                         onClick = {
                             scope.launch { drawerState.close() }
                             navController.navigate("TopicList") {
-                                popUpTo(0) { inclusive = true }
+                                popUpTo("TopicList") { inclusive = true }
                                 launchSingleTop = true
                             }
                         },
@@ -99,7 +99,7 @@ fun ModalNavigationDrawerMain(
                         onClick = {
                             scope.launch { drawerState.close() }
                             navController.navigate("ExportImportView") {
-                                popUpTo(0) { inclusive = true }
+                                popUpTo("TopicList") { inclusive = false }
                                 launchSingleTop = true
                             }
                         },

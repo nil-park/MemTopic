@@ -76,11 +76,12 @@ MemTopic 앱의 Topic 데이터를 JSON 형식으로 내보내고 가져올 수 
   - 사용자 친화적인 권한 안내 다이얼로그 추가
   - 파일 선택기 취소 시 적절한 처리
 
-- [ ] **Step 7: 테스트 및 완성도 향상**
-  - 빈 토픽 목록 export 처리
-  - 잘못된 JSON 파일 import 시 에러 처리
-  - 대량 토픽 (100개 이상) import 테스트
-  - 한글 및 특수문자 포함 토픽 제목 처리 확인
+- [x] **Step 7: 테스트 및 완성도 향상**
+  - 빈 토픽 목록 export 처리 (이미 구현됨 - UI에서 비활성화)
+  - 잘못된 JSON 파일 import 시 에러 처리 강화
+  - 대량 토픽 (100개 이상) import 성능 최적화 (bulk upsert)
+  - 한글 및 특수문자 포함 토픽 제목 처리 확인 (UTF-8 명시)
+  - 단위 테스트 작성 (SimpleJsonTest, TestDataGenerator)
 
 ## 고려 사항
 
@@ -106,9 +107,9 @@ MemTopic 앱의 Topic 데이터를 JSON 형식으로 내보내고 가져올 수 
 
 (구현 진행 중 발견되는 이슈 기록 예정: AI Agent를 별도 지시 없이 수정하지 말 것)
 
-### commit {미정}
+### commit 6cbc6449
 
 - 의도와 다르게 작성된 부분, 또는 버그 설명
 
-  - Desired:
-  - Got:
+  - Desired: 토픽 내보내기/가져오기 화면에서 Back 버튼을 누르면 TopicListView로 이동
+  - Got: 내비게이션 최상단이라서 앱 종료
