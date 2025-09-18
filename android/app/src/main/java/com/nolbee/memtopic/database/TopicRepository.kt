@@ -10,6 +10,7 @@ enum class TopicSortType {
 
 interface ITopicRepository {
     suspend fun upsertTopic(topic: Topic)
+    suspend fun upsertTopics(topics: List<Topic>)
     suspend fun deleteTopic(topic: Topic)
     suspend fun getTopic(id: Int): Topic?
     fun getTopicList(sortType: TopicSortType): Flow<List<Topic>>
@@ -19,6 +20,10 @@ interface ITopicRepository {
 class TopicRepository(private val topicDao: TopicDao) : ITopicRepository {
     override suspend fun upsertTopic(topic: Topic) {
         topicDao.upsertTopic(topic)
+    }
+
+    override suspend fun upsertTopics(topics: List<Topic>) {
+        topicDao.upsertTopics(topics)
     }
 
     override suspend fun deleteTopic(topic: Topic) {
@@ -44,6 +49,7 @@ class TopicRepository(private val topicDao: TopicDao) : ITopicRepository {
 
 class MockTopicRepository : ITopicRepository {
     override suspend fun upsertTopic(topic: Topic) {}
+    override suspend fun upsertTopics(topics: List<Topic>) {}
     override suspend fun deleteTopic(topic: Topic) {}
     override suspend fun getTopic(id: Int): Topic? = null
     override fun getTopicList(sortType: TopicSortType): Flow<List<Topic>> =

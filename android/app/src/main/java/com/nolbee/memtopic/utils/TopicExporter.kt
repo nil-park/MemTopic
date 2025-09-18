@@ -74,7 +74,7 @@ class TopicExporter(private val context: Context) {
     /**
      * Convert Topic to SerializableTopic
      */
-    fun Topic.toSerializableTopic(): SerializableTopic {
+    private fun Topic.toSerializableTopic(): SerializableTopic {
         return SerializableTopic(
             title = this.title,
             content = this.content,
@@ -85,7 +85,7 @@ class TopicExporter(private val context: Context) {
     /**
      * Create export data from list of topics
      */
-    fun createExportData(topics: List<Topic>): TopicExportData {
+    private fun createExportData(topics: List<Topic>): TopicExportData {
         return TopicExportData(
             topicCount = topics.size,
             topics = topics.map { it.toSerializableTopic() }
@@ -120,7 +120,8 @@ class TopicExporter(private val context: Context) {
     fun writeJsonToUri(uri: Uri, jsonData: String): Boolean {
         return try {
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                outputStream.write(jsonData.toByteArray())
+                // Explicitly use UTF-8 encoding for proper Korean/Unicode support
+                outputStream.write(jsonData.toByteArray(Charsets.UTF_8))
                 outputStream.flush()
             }
             true

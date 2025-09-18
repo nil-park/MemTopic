@@ -41,7 +41,8 @@ class TopicImporter(
     private fun readJsonFromUri(uri: Uri): String? {
         return try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                inputStream.bufferedReader().use { reader ->
+                // Explicitly use UTF-8 encoding for proper Korean/Unicode support
+                inputStream.bufferedReader(Charsets.UTF_8).use { reader ->
                     reader.readText()
                 }
             }
@@ -64,12 +65,15 @@ class TopicImporter(
      */
     private fun parseAndValidateJson(jsonString: String): TopicExportData? {
         return try {
-            val exportData = json.decodeFromString<TopicExportData>(jsonString)
-
-            // Basic validation
-            if (exportData.topics.isEmpty()) {
+            // Check if string is empty or just whitespace
+            if (jsonString.isBlank()) {
                 return null
             }
+
+            val exportData = json.decodeFromString<TopicExportData>(jsonString)
+
+            // Basic validation - allow empty topics for import
+            // (사용자가 빈 파일을 import할 수도 있음)
 
             // Validate each topic has required fields
             exportData.topics.forEach { topic ->
@@ -79,6 +83,10 @@ class TopicImporter(
             }
 
             exportData
+        } catch (e: kotlinx.serialization.SerializationException) {
+            // JSON 구조나 형식이 잘못됨
+            e.printStackTrace()
+            null
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -88,7 +96,7 @@ class TopicImporter(
     /**
      * Convert SerializableTopic to Topic with duplicate title handling
      */
-    private suspend fun SerializableTopic.toTopic(existingTitles: Set<String>): Topic {
+    private fun SerializableTopic.toTopic(existingTitles: Set<String>): Topic {
         val finalTitle = generateUniqueTitle(this.title, existingTitles)
 
         return Topic(
@@ -129,7 +137,7 @@ class TopicImporter(
 
             // Parse and validate JSON
             val exportData = parseAndValidateJson(jsonString)
-                ?: return ImportResult.Error("유효하지 않은 JSON 파일입니다")
+                ?: return ImportResult.Error("유효하지 않은 JSON 파일입니다. MemTopic에서 내보낸 파일인지 확인해주세요.")
 
             // Get existing topic titles to handle duplicates
             val existingTopics = repository.getAllTopics()
@@ -143,9 +151,14 @@ class TopicImporter(
                 existingTitles.add(topic.title) // Update set for next iteration
             }
 
-            // Bulk insert topics
-            topicsToImport.forEach { topic ->
-                repository.upsertTopic(topic)
+            // Log info for large imports
+            if (topicsToImport.size > 50) {
+                println("MemTopic: Importing large dataset with ${topicsToImport.size} topics")
+            }
+
+            // Bulk insert topics for better performance with large datasets
+            if (topicsToImport.isNotEmpty()) {
+                repository.upsertTopics(topicsToImport)
             }
 
             ImportResult.Success(topicsToImport.size)

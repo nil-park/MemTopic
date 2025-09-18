@@ -28,6 +28,9 @@ interface TopicDao {
     @Upsert
     suspend fun upsertTopic(topic: Topic)
 
+    @Upsert
+    suspend fun upsertTopics(topics: List<Topic>)
+
     @Delete
     suspend fun deleteTopic(topic: Topic)
 
