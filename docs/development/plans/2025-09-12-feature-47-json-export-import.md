@@ -70,10 +70,11 @@ MemTopic 앱의 Topic 데이터를 JSON 형식으로 내보내고 가져올 수 
   - ExportImportState sealed class 추가
   - Hilt 의존성 주입으로 TopicExporter/TopicImporter 제공
 
-- [ ] **Step 6: 파일 접근 권한 처리**
-  - Android 13 이상 대응 문서 접근 권한 처리
-  - AndroidManifest.xml 업데이트 (필요시)
-  - 권한 거부 시 사용자 안내 메시지
+- [x] **Step 6: 파일 접근 권한 처리**
+  - Android 13 이상 대응 문서 접근 권한 처리 (Storage Access Framework 사용)
+  - 구체적인 에러 처리 (SecurityException, FileNotFoundException)
+  - 사용자 친화적인 권한 안내 다이얼로그 추가
+  - 파일 선택기 취소 시 적절한 처리
 
 - [ ] **Step 7: 테스트 및 완성도 향상**
   - 빈 토픽 목록 export 처리
