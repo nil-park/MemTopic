@@ -109,7 +109,19 @@ MemTopic 앱의 Topic 데이터를 JSON 형식으로 내보내고 가져올 수 
 
 ### commit 6cbc6449
 
-- 의도와 다르게 작성된 부분, 또는 버그 설명
+- Desired: 토픽 내보내기/가져오기 화면에서 Back 버튼을 누르면 TopicListView로 이동
+- Got: 내비게이션 최상단이라서 앱 종료
 
-  - Desired: 토픽 내보내기/가져오기 화면에서 Back 버튼을 누르면 TopicListView로 이동
-  - Got: 내비게이션 최상단이라서 앱 종료
+- 상태: Resolved
+
+### commit 8174e828
+
+- Desired: 토픽 가져오기 할 때 중복된 제목은 내용도 일치하면 무시, 내용이 다르면 번호 추가.
+- Got: 완전히 동일한 토픽 내용도 제목에 번호가 붙고 새로 추가됨.
+
+- 상태: Resolved
+  - TopicImporter.kt의 toTopicWithDuplicateCheck 메서드로 완전 중복(제목+내용) 검사 구현
+  - 완전 중복 토픽은 무시하고, 제목만 같은 경우에만 번호 추가
+  - ImportResult.Success에 duplicatesIgnored 카운트 추가
+  - UI 메시지에서 무시된 중복 토픽 개수 표시
+  - 불필요한 legacy toTopic 메서드 제거

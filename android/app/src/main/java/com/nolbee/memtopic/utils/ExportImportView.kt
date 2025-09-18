@@ -39,8 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.nolbee.memtopic.database.ITopicViewModel
 import com.nolbee.memtopic.database.MockTopicRepository
 import com.nolbee.memtopic.database.MockTopicViewModel
@@ -50,7 +48,6 @@ import kotlinx.coroutines.launch
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun ExportImportView(
-    navController: NavHostController,
     topicViewModel: ITopicViewModel,
     topicExporter: TopicExporter,
     topicImporter: TopicImporter
@@ -121,9 +118,14 @@ fun ExportImportView(
                     try {
                         when (val importResult = topicImporter.importTopicsFromUri(uri)) {
                             is ImportResult.Success -> {
+                                val message = if (importResult.duplicatesIgnored > 0) {
+                                    "${importResult.importedCount}개의 토픽을 가져왔습니다\n(${importResult.duplicatesIgnored}개의 중복 토픽은 무시됨)"
+                                } else {
+                                    "${importResult.importedCount}개의 토픽을 가져왔습니다"
+                                }
                                 Toast.makeText(
                                     context,
-                                    "${importResult.importedCount}개의 토픽을 가져왔습니다",
+                                    message,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -248,7 +250,7 @@ fun ExportImportView(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "JSON 파일에서 토픽을 가져옵니다\n중복된 제목은 자동으로 번호가 추가됩니다",
+                        text = "JSON 파일에서 토픽을 가져옵니다\n완전히 동일한 토픽은 무시되고, 제목만 같은 경우 번호가 추가됩니다",
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
@@ -302,7 +304,6 @@ fun ExportImportViewPreview() {
     val context = LocalContext.current
     MemTopicTheme {
         ExportImportView(
-            navController = rememberNavController(),
             topicViewModel = MockTopicViewModel(),
             topicExporter = TopicExporter(context),
             topicImporter = TopicImporter(context, MockTopicRepository())

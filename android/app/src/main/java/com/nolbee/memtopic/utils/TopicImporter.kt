@@ -12,7 +12,11 @@ import java.util.Date
  * Result class for import operations
  */
 sealed class ImportResult {
-    data class Success(val importedCount: Int) : ImportResult()
+    data class Success(
+        val importedCount: Int,
+        val duplicatesIgnored: Int = 0
+    ) : ImportResult()
+
     data class Error(val message: String) : ImportResult()
 }
 
@@ -94,9 +98,22 @@ class TopicImporter(
     }
 
     /**
-     * Convert SerializableTopic to Topic with duplicate title handling
+     * Convert SerializableTopic to Topic with smart duplicate handling
+     * Returns null if the topic is a complete duplicate (same title AND content)
      */
-    private fun SerializableTopic.toTopic(existingTitles: Set<String>): Topic {
+    private fun SerializableTopic.toTopicWithDuplicateCheck(existingTopics: List<Topic>): Topic? {
+        // Check for complete duplicates (same title AND content)
+        val completeDuplicate = existingTopics.find { existing ->
+            existing.title == this.title && existing.content == this.content
+        }
+
+        if (completeDuplicate != null) {
+            // Complete duplicate found - ignore this topic
+            return null
+        }
+
+        // Check for title-only duplicates
+        val existingTitles = existingTopics.map { it.title }.toSet()
         val finalTitle = generateUniqueTitle(this.title, existingTitles)
 
         return Topic(
@@ -107,6 +124,7 @@ class TopicImporter(
             lastPlayback = Date()
         )
     }
+
 
     /**
      * Generate unique title by adding number suffix if duplicate exists
@@ -139,16 +157,23 @@ class TopicImporter(
             val exportData = parseAndValidateJson(jsonString)
                 ?: return ImportResult.Error("유효하지 않은 JSON 파일입니다. MemTopic에서 내보낸 파일인지 확인해주세요.")
 
-            // Get existing topic titles to handle duplicates
-            val existingTopics = repository.getAllTopics()
-            val existingTitles = existingTopics.map { it.title }.toMutableSet()
+            // Get existing topics to handle duplicates
+            val existingTopics = repository.getAllTopics().toMutableList()
 
-            // Convert SerializableTopics to Topics with duplicate handling
+            // Convert SerializableTopics to Topics with smart duplicate handling
             val topicsToImport = mutableListOf<Topic>()
+            var duplicatesIgnored = 0
             exportData.topics.forEach { serializableTopic ->
-                val topic = serializableTopic.toTopic(existingTitles)
-                topicsToImport.add(topic)
-                existingTitles.add(topic.title) // Update set for next iteration
+                val newTopic = serializableTopic.toTopicWithDuplicateCheck(existingTopics)
+
+                if (newTopic != null) {
+                    // Not a complete duplicate - add to import list
+                    topicsToImport.add(newTopic)
+                    existingTopics.add(newTopic) // Update list for next iteration
+                } else {
+                    // Complete duplicate found - increment counter
+                    duplicatesIgnored++
+                }
             }
 
             // Log info for large imports
@@ -156,12 +181,17 @@ class TopicImporter(
                 println("MemTopic: Importing large dataset with ${topicsToImport.size} topics")
             }
 
+            // Log duplicate info if any were ignored
+            if (duplicatesIgnored > 0) {
+                println("MemTopic: Ignored $duplicatesIgnored complete duplicate(s)")
+            }
+
             // Bulk insert topics for better performance with large datasets
             if (topicsToImport.isNotEmpty()) {
                 repository.upsertTopics(topicsToImport)
             }
 
-            ImportResult.Success(topicsToImport.size)
+            ImportResult.Success(topicsToImport.size, duplicatesIgnored)
         } catch (e: Exception) {
             e.printStackTrace()
             ImportResult.Error("가져오기 중 오류가 발생했습니다: ${e.message}")
