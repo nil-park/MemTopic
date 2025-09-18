@@ -6,6 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.nolbee.memtopic.utils.TopicExporter
+import com.nolbee.memtopic.utils.TopicImporter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -96,4 +98,17 @@ object TopicDatabaseModule {
     fun provideSettingsRepository(
         settingsDao: SettingsDao
     ) = SettingsRepository(settingsDao)
+
+    @Provides
+    @Singleton
+    fun provideTopicExporter(
+        @ApplicationContext context: Context
+    ) = TopicExporter(context)
+
+    @Provides
+    @Singleton
+    fun provideTopicImporter(
+        @ApplicationContext context: Context,
+        repository: TopicRepository
+    ) = TopicImporter(context, repository)
 }
