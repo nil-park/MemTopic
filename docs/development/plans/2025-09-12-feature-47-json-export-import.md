@@ -63,10 +63,12 @@ MemTopic 앱의 Topic 데이터를 JSON 형식으로 내보내고 가져올 수 
   - Import 파일 선택기 및 진행 상태 표시
   - 메뉴 드로어에 "토픽 내보내기/가져오기" 메뉴 추가
 
-- [ ] **Step 5: ViewModel 통합**
+- [x] **Step 5: ViewModel 통합**
   - TopicViewModel에 export/import 메서드 추가
   - UI 상태 관리 (loading, success, error)
   - 비동기 처리를 위한 viewModelScope 활용
+  - ExportImportState sealed class 추가
+  - Hilt 의존성 주입으로 TopicExporter/TopicImporter 제공
 
 - [ ] **Step 6: 파일 접근 권한 처리**
   - Android 13 이상 대응 문서 접근 권한 처리
@@ -101,7 +103,7 @@ MemTopic 앱의 Topic 데이터를 JSON 형식으로 내보내고 가져올 수 
 
 ## 수정 또는 확인이 필요한 사항
 
-(구현 진행 중 발견되는 이슈 기록 예정)
+(구현 진행 중 발견되는 이슈 기록 예정: AI Agent를 별도 지시 없이 수정하지 말 것)
 
 ### commit {미정}
 
