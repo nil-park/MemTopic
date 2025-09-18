@@ -45,6 +45,14 @@ class TopicImporter(
                     reader.readText()
                 }
             }
+        } catch (e: SecurityException) {
+            // Permission denied - this shouldn't happen with SAF but just in case
+            e.printStackTrace()
+            null
+        } catch (e: java.io.FileNotFoundException) {
+            // File not accessible or not found
+            e.printStackTrace()
+            null
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -117,7 +125,7 @@ class TopicImporter(
         return try {
             // Read JSON from URI
             val jsonString = readJsonFromUri(uri)
-                ?: return ImportResult.Error("파일을 읽을 수 없습니다")
+                ?: return ImportResult.Error("파일을 읽을 수 없습니다. 파일이 존재하고 접근 가능한지 확인해주세요.")
 
             // Parse and validate JSON
             val exportData = parseAndValidateJson(jsonString)

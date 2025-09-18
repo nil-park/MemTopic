@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,6 +61,7 @@ fun ExportImportView(
 
     var isExporting by remember { mutableStateOf(false) }
     var isImporting by remember { mutableStateOf(false) }
+    var showPermissionInfoDialog by remember { mutableStateOf(false) }
 
     // Export file launcher
     val exportLauncher = rememberLauncherForActivityResult(
@@ -97,7 +100,13 @@ fun ExportImportView(
                 }
             }
         } else {
+            // User cancelled or permission denied
             isExporting = false
+            if (result.resultCode == android.app.Activity.RESULT_CANCELED) {
+                // User intentionally cancelled, no need to show error
+            } else {
+                showPermissionInfoDialog = true
+            }
         }
     }
 
@@ -139,7 +148,13 @@ fun ExportImportView(
                 }
             }
         } else {
+            // User cancelled or permission denied
             isImporting = false
+            if (result.resultCode == android.app.Activity.RESULT_CANCELED) {
+                // User intentionally cancelled, no need to show error
+            } else {
+                showPermissionInfoDialog = true
+            }
         }
     }
 
@@ -255,6 +270,29 @@ fun ExportImportView(
                 }
             }
         }
+    }
+
+    // Permission info dialog
+    if (showPermissionInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionInfoDialog = false },
+            title = { Text("파일 접근 안내") },
+            text = {
+                Text(
+                    "파일을 저장하거나 불러오기 위해서는 파일 접근 권한이 필요합니다.\n\n" +
+                            "• 내보내기: 저장할 위치를 선택해주세요\n" +
+                            "• 가져오기: 불러올 JSON 파일을 선택해주세요\n\n" +
+                            "파일 선택기에서 원하는 위치나 파일을 선택하시면 됩니다."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showPermissionInfoDialog = false }
+                ) {
+                    Text("확인")
+                }
+            }
+        )
     }
 }
 

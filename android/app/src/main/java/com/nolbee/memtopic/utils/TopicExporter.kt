@@ -124,6 +124,14 @@ class TopicExporter(private val context: Context) {
                 outputStream.flush()
             }
             true
+        } catch (e: SecurityException) {
+            // Permission denied - this shouldn't happen with SAF but just in case
+            e.printStackTrace()
+            false
+        } catch (e: java.io.FileNotFoundException) {
+            // File not accessible
+            e.printStackTrace()
+            false
         } catch (e: Exception) {
             e.printStackTrace()
             false
