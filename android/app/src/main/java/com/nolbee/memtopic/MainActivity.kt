@@ -229,11 +229,11 @@ fun MainView(
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None }
                     ) {
-                        val context = LocalContext.current
+                        val localContext = LocalContext.current
                         ExportImportView(
                             topicViewModel = topicViewModel,
-                            topicExporter = TopicExporter(context),
-                            topicImporter = TopicImporter(context, topicRepository!!)
+                            topicExporter = TopicExporter(localContext),
+                            topicImporter = TopicImporter(localContext, topicRepository!!)
                         )
                     }
                 }
