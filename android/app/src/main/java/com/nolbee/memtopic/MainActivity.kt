@@ -231,7 +231,6 @@ fun MainView(
                     ) {
                         val context = LocalContext.current
                         ExportImportView(
-                            navController = navController,
                             topicViewModel = topicViewModel,
                             topicExporter = TopicExporter(context),
                             topicImporter = TopicImporter(context, topicRepository!!)
