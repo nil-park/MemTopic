@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
 }
 
 android {
@@ -88,6 +89,9 @@ dependencies {
 
     // other dependencies
     implementation("com.google.code.gson:gson:2.11.0")
+    
+    // kotlinx.serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // gcp dependencies
     implementation(platform("com.google.cloud:libraries-bom:26.58.0"))
